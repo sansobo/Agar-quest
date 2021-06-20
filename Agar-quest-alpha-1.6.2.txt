@@ -1,0 +1,2547 @@
+#This code is a 2-D RPG game that was created by Terence
+#Sun, Agar Quest Alpha 1.6.0
+import simplegui, random, math
+game_start = False
+pause = False
+#backgrounds
+start_background = simplegui.load_image("http://2.bp.blogspot.com/-wLSZ-5ZPImM/UjvU_M7iQRI/AAAAAAAABRY/95lFioWbGL8/s1600/2013-09-20+10.44.32.jpg")
+START_BACKGROUND_WIDTH = 1200
+START_BACKGROUND_HEIGHT = 1600
+# Load image
+PLAYER_IMG = simplegui.load_image("https://ssl-forum-files.fobby.net/forum_attachments/0009/8883/scientist.png")   
+WALL1_IMG = simplegui.load_image("https://banner2.kisspng.com/20180323/olw/kisspng-new-super-mario-bros-2-new-super-mario-bros-2-ne-brick-5ab58e791c74b9.6998658315218479291166.jpg")
+WARP_IMG = simplegui.load_image("http://pixelartmaker.com/art/7ce10e2eaa1ffa4.png")
+PLAYER_IMG_WIDTH = 136/4
+PLAYER_IMG_HEIGHT = 208/4
+player_pos_display = ''
+STAT_HEIGHT = 100
+#player stats
+UP_VELOCITY = -2
+DOWN_VELOCITY = 2
+RIGHT_VELOCITY = 2
+LEFT_VELOCITY = -2
+UP_SPRINT_VELOCITY = -4
+DOWN_SPRINT_VELOCITY = 4
+RIGHT_SPRINT_VELOCITY = 4
+LEFT_SPRINT_VELOCITY = -4
+player_list = []
+PLAYER_MAX_HEALTH = 100.0
+PLAYER_STARTING_EXP = 0
+STARTING_SKILL_POINTS = 3
+#force field stuff
+SHIELDING = 95
+FORCE_FIELD_IMG = simplegui.load_image('http://i.imgur.com/JqDGLfB.png')
+FORCE_FIELD_IMG_SIZE = [1260, 1260]
+FORCE_FIELD_SIZE = [60,60]
+FORCE_FIELD_BUFF_IMG = simplegui.load_image('https://t6.rbxcdn.com/4db8736a2056fab6481cce745ec9ba1a')
+FORCE_FIELD_BUFF_IMG_SIZE = [420,420]
+FORCE_FIELD_BUFF_SIZE = [20,20]
+#wrecking ball stats
+spin_radius = 40
+radius = 10
+spin = math.pi
+physics = True
+wreck_timer = 0
+WRECKINGBALL_DAMAGE = 11
+#regeneration stuff
+AURA_BUFF_IMG = simplegui.load_image('http://www.pngmart.com/files/3/Red-Cross-PNG-HD.png')
+AURA_BUFF_IMG_SIZE = [1200,1202]
+AURA_BUFF_SIZE = [20,20]
+AURA_IMG = simplegui.load_image('https://t6.rbxcdn.com/27444d6fe13be85223ffbe805b6bb0ae')
+AURA_IMG_SIZE = [420,420]
+AURA_SIZE = [60,60]
+#scalpel stats
+SCALPEL_IMG = simplegui.load_image("https://www.trickortreatstudios.com/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/H/a/Halloween_II_Scalpel_7_1.png")
+SCALPEL_IMG_WIDTH = 436
+SCALPEL_IMG_HEIGHT = 639
+SCALPEL_SIZE = [20,30]
+SCALPEL_DAMAGE = 28
+#erlenmeyer flask stats
+chemistry_list = []
+FLASK_IMG = simplegui.load_image("https://storage.needpix.com/thumbs/erlenmeyer-flask-296800_1280.png")
+FLASK_IMG_WIDTH = 500
+FLASK_IMG_HEIGHT = 570
+FLASK_SIZE = [20,20]
+FLASK_DAMAGE = 3
+FLASK_EXPLOSION_SIZE = 80
+FLASK_BURN_DURATION = 300
+BURN_DAMAGE = 4
+BURN_IMG = simplegui.load_image('http://www.transparentpng.com/download/fire/fire-png-image-by-osborne-on-transparent-png-5.png')
+BURN_IMG_WIDTH = 500
+BURN_IMG_HEIGHT = 375
+BURNING_IMG = simplegui.load_image('https://clipart.info/images/ccovers/1495818555cartoon-fire-flames-emoji-png-transparent.png')
+BURNING_IMG_WIDTH = 400
+BURNING_IMG_HEIGHT = 400
+BURNING_SIZE = [20,20]
+#ENEMY STUFF
+FACES = ['up', 'down', 'left', 'right']
+#zombie stuff
+ZOMBIE_HEALTH = 100
+ZOMBIE2_HEALTH = 300
+ZOMBIE_EXP = 10
+ZOMBIE2_EXP = 50
+ZOMBIE_IMG = simplegui.load_image("https://opengameart.org/sites/default/files/zombie7_0.png")
+ZIMAGE_WIDTH = 192/3
+ZIMAGE_HEIGHT = 256/4
+ZOMBIE_SIZE = (40,40)
+ZOMBIE_LEFT=ZOMBIE_SIZE[0]/4
+ZOMBIE_RIGHT=ZOMBIE_SIZE[0]/4
+ZOMBIE_UP=ZOMBIE_SIZE[1]/3
+ZOMBIE_DOWN=ZOMBIE_SIZE[1]/3
+ZOMBIE_UP_VELOCITY = [0,-3]
+ZOMBIE_DOWN_VELOCITY = [0,3]
+ZOMBIE_RIGHT_VELOCITY = [3,0]
+ZOMBIE_LEFT_VELOCITY = [-3,0]
+ZOMBIE2_UP_VELOCITY = [0,-8]
+ZOMBIE2_DOWN_VELOCITY = [0,8]
+ZOMBIE2_RIGHT_VELOCITY = [8,0]
+ZOMBIE2_LEFT_VELOCITY = [-8,0]
+ZOMBIE_VEL = [ZOMBIE_UP_VELOCITY,
+               ZOMBIE_DOWN_VELOCITY,
+               ZOMBIE_RIGHT_VELOCITY,
+               ZOMBIE_LEFT_VELOCITY]
+ZOMBIE2_VEL = [ZOMBIE2_UP_VELOCITY,
+               ZOMBIE2_DOWN_VELOCITY,
+               ZOMBIE2_RIGHT_VELOCITY,
+               ZOMBIE2_LEFT_VELOCITY]
+#super zombie stuff
+SUPER_ZOMBIE_DAMAGE = 30
+SUPER_ZOMBIE_HEALTH = 400
+SUPER_ZOMBIE_EXP = 160
+SUPER_ZOMBIE2_DAMAGE = 60
+SUPER_ZOMBIE2_HEALTH = 700
+SUPER_ZOMBIE2_EXP = 400
+SZOMBIE_IMG = simplegui.load_image("https://thestoryteller01.files.wordpress.com/2015/02/zombie08.png?w=630")
+SZIMAGE_WIDTH = 128/4
+SZIMAGE_HEIGHT = 192/4
+SZOMBIE_SIZE = (25,35)
+SZOMBIE_LEFT = SZOMBIE_SIZE[0]/4
+SZOMBIE_RIGHT = SZOMBIE_SIZE[0]/4
+SZOMBIE_UP= SZOMBIE_SIZE[1]/2.3
+SZOMBIE_DOWN = SZOMBIE_SIZE[1]/2.2
+SZOMBIE_UP_VELOCITY = [0,-5]
+SZOMBIE_DOWN_VELOCITY = [0,5]
+SZOMBIE_RIGHT_VELOCITY = [5,0]
+SZOMBIE_LEFT_VELOCITY = [-5,0]
+SZOMBIE_VEL = [SZOMBIE_UP_VELOCITY,
+               SZOMBIE_DOWN_VELOCITY,
+               SZOMBIE_RIGHT_VELOCITY,
+               SZOMBIE_LEFT_VELOCITY]
+#flask thrower stuff
+THROWER_DAMAGE = 15
+THROWER_FLASK_DAMAGE = 30
+THROWER_HEALTH = 150
+THROWER2_DAMAGE = 30
+THROWER2_FLASK_DAMAGE = 45
+THROWER2_HEALTH = 350
+THROWER_IMG = simplegui.load_image("https://i2.wp.com/i444.photobucket.com/albums/qq168/grandmadeb_rmvx/Shareable%20Artists/Themo/themomonstersprites026_zpsvom8bxsn.png?zoom=2")
+THROWER_IMG_WIDTH = 384/12
+THROWER_IMG_HEIGHT = 256/8
+THROWER_SIZE = [32,32]
+THROWER_LEFT = THROWER_SIZE[0]/4
+THROWER_RIGHT = THROWER_SIZE[0]/4
+THROWER_UP = THROWER_SIZE[1]/2
+THROWER_DOWN = THROWER_SIZE[1]/2
+THROWER_UP_VELOCITY = [0,-2]
+THROWER_DOWN_VELOCITY = [0,2]
+THROWER_RIGHT_VELOCITY = [2,0]
+THROWER_LEFT_VELOCITY = [-2,0]
+THROWER_VEL = [THROWER_UP_VELOCITY,
+               THROWER_DOWN_VELOCITY,
+               THROWER_RIGHT_VELOCITY,
+               THROWER_LEFT_VELOCITY]
+THROWER_FLASK_IMG = simplegui.load_image('https://cdn.pixabay.com/photo/2012/04/13/20/40/flask-33572_1280.png')
+THROWER_FLASK_IMG_SIZE = [1230,1280]
+THROWER_FLASK_SIZE = [20,20]
+#Tony stuff
+TONY_DAMAGE = 30
+TONY_HEALTH = 3000
+TONY_IMG = simplegui.load_image("https://i.imgur.com/EDtXe0W.png")
+TONY2_IMG = simplegui.load_image("https://i.imgur.com/OyiqVEq.png")
+TONY_IMG_WIDTH = 233
+TONY_IMG_HEIGHT = 419
+TONY_SIZE = [20,40]
+TONY_LEFT = TONY_SIZE[0]/2
+TONY_RIGHT = TONY_SIZE[0]/2
+TONY_UP = TONY_SIZE[1]/2
+TONY_DOWN = TONY_SIZE[1]/2
+TONY_UP_VELOCITY = [0,-4]
+TONY_DOWN_VELOCITY = [0,4]
+TONY_RIGHT_VELOCITY = [4,0]
+TONY_LEFT_VELOCITY = [-4,0]
+TONY_VEL = [TONY_UP_VELOCITY,
+               TONY_DOWN_VELOCITY,
+               TONY_RIGHT_VELOCITY,
+               TONY_LEFT_VELOCITY]
+TONY_FLASK_IMG = simplegui.load_image('https://cdn.pixabay.com/photo/2012/04/13/20/40/flask-33572_1280.png')
+TONY_FLASK_IMG_SIZE = [1230,1280]
+TONY_FLASK_SIZE = [20,20]
+#small health flask stuff
+SHEALTH_IMG = simplegui.load_image('http://images.easyfreeclipart.com/922/flask-beaker-red-chemistry-science-measurement-922671.png')
+SHEALTH_IMG_WIDTH = 640
+SHEALTH_IMG_HEIGHT = 604
+SHEALTH_SIZE = (30,30)
+SHEALTH_RECOVER = 30
+#medium health flask stuff
+MHEALTH_IMG = simplegui.load_image('https://nksoldes2015.com/images/medicine-clipart-kit-2.png')
+MHEALTH_IMG_WIDTH = 512
+MHEALTH_IMG_HEIGHT = 512
+MHEALTH_SIZE = (30,30)
+MHEALTH_RECOVER = 50
+#large health flask stuff
+LHEALTH_IMG = simplegui.load_image('https://www.jeancoutu.com/catalog-images/318337/viewer/0/polysporin-polysporin-triple-ointment-15-g.png')
+LHEALTH_IMG_WIDTH = 362
+LHEALTH_IMG_HEIGHT = 330
+LHEALTH_SIZE = (30,30)
+LHEALTH_RECOVER = 100
+#burn heal stuff
+BURN_HEAL_IMG = simplegui.load_image('http://pngimg.com/uploads/extinguisher/extinguisher_PNG20.png')
+BURN_HEAL_IMG_WIDTH = 600
+BURN_HEAL_IMG_HEIGHT = 600
+BURN_HEAL_SIZE = (30,30)
+#agar stuff
+AGAR_IMG = simplegui.load_image('https://www.nowfoods.com/sites/default/files/styles/product_page_image/public/sku-images/6410_v7.png?itok=439kxemc')
+AGAR_IMG_WIDTH = 431
+AGAR_IMG_HEIGHT = 880
+AGAR_SIZE = (20,40)
+# Size of player on canvas
+PLAYER_SIZE = (20,30)
+PLAYER_UP = PLAYER_SIZE[1]/2
+PLAYER_DOWN = PLAYER_SIZE[1]/2
+PLAYER_LEFT = PLAYER_SIZE[0]/2
+PLAYER_RIGHT = PLAYER_SIZE[0]/2
+BLOCK_SIZE = [40,40]
+#developer settings
+coordinate_display = False
+hitbox_display = False
+enemy_health_display = True
+#stages
+#w is wall
+#a is fake wall
+#z is zombie
+#S is super zombie
+#t is thrower
+#x is stronger zombie
+#y is stronger super zombie
+#r is stronger thrower
+#i is warp portal
+stage_1 = [
+    "AWWWWWWWWWA",
+    "W      Z  W",
+    "W         W",
+    "AWWW WW  WA",
+    "W WW W   WA",
+    "W    W    i",
+    "AWW  WWWWWA",
+    " AW   WA   ",
+    "  AW   W   ",
+    "   AW  W   ",
+    "    AiWA   "
+    ]
+stage_2 = [
+    'AWWWWWWWWWA',
+    'W    Z    W',
+    'W WWWWWW  W',
+    'W  W Z W  W',
+    'W  W   W  W',
+    'i  W   W  i',
+    'W  W   W  W',
+    'W  W   W  W',
+    'W  W   W  W',
+    'W     W   W',
+    'AWWWWWWWWWA'
+    ]
+stage_3 = [
+    'AWWWWWWWWWA',
+    'W      Z  W',
+    'W  W W W  W',
+    'W         W',
+    'W  W W W  W',
+    'i    Z    i',
+    'W  W W W  W',
+    'W         W',
+    'W  W W W  W',
+    'W      Z  W',
+    'AWWWWWWWWWA'
+    ]
+stage_4 = [
+    'AWWWWWWWWWA',
+    'W      W  W',
+    'W WSW  WW W',
+    'W WWW  WW W',
+    'W   W     W',
+    'i   W     i',
+    'W   W     W',
+    'W   WWWWW W',
+    'W      Z  W',
+    'W         W',
+    'AWWWWWWWWWA'
+    ]
+stage_5 = [
+    'AWWWWWWWWWA',
+    'W         W',
+    'W         W',
+    'W       Z W',
+    'W         W',
+    'i         W',
+    'W WWW     W',
+    'W   W     W',
+    'W S W     W',
+    'W       Z W',
+    'AWWWWiWWWWA'
+    ]
+stage_6 = [
+    'AWWWWiWWWWA',
+    'W         W',
+    'AWWWWWWW  W',
+    'WZ        W',
+    'W      W  W',
+    'AWWWWWWW  W',
+    'W         W',
+    'W  WWWWWWWA',
+    'W      Z  W',
+    'W         W',
+    'AWWWWiWWWWA'
+    ]
+stage_7 = [
+    'WWWWWWWWWWW',
+    'W    Y    W',
+    'W         W',
+    'W         W',
+    'W R       W',
+    'W    i    i',
+    'W         W',
+    'W    Y    W',
+    'W  Y      W',
+    'W         W',
+    'WWWWWiWWWWW'
+    ]
+stage_8 = [
+    'WWWWWWWWWWW',
+    'W     R   W',
+    'W         W',
+    'W         W',
+    'W         W',
+    'i         i',
+    'W         W',
+    'W         W',
+    'W         W',
+    'W     R   W',
+    'WWWWWWWWWWW'
+    ]
+stage_9 = [
+    'AWWWWWWWWWA',
+    'W         W',
+    'W     R   W',
+    'W         W',
+    'W  X      W',
+    'i         W',
+    'AWWWW     W',
+    '    W     W',
+    '    W   X W',
+    '    W     W',
+    '    AiWWWWA'
+    ]
+stage_10 = [
+    'AWWWWiWWWWA',
+    'W         W',
+    'AW       WA',
+    ' AW   X WA ',
+    '  AW   WA  ',
+    '   AW WA   ',
+    '  AW   WA  ',
+    ' AW     WA ',
+    'AW X     WA',
+    'W         W',
+    'AWWWWiWWWWA'
+    ]
+stage_11 = [
+    'AWWWWiWWWWA',
+    'W         W',
+    'WZ      Z W',
+    'W         W',
+    'W         W',
+    'W WWWWWWWWA',
+    'W         W',
+    'W       Z W',
+    'W         W',
+    'W         W',
+    'AWWWWiWWWWA'
+    ]
+stage_12 = [
+    'WWWWWiWWWWW',
+    'W         W',
+    'W         W',
+    'W      X  W',
+    'W     WWW W',
+    'W         W',
+    'W  R      W',
+    'W WWW     W',
+    'W      Y  W',
+    'W         W',
+    'WWWWWiWWWWW'
+    ]
+stage_13 = [
+    'WWWWWWWWWWW',
+    'W         W',
+    'W    B    W',
+    'W         W',
+    'W         W',
+    'W         W',
+    'W         W',
+    'W         W',
+    'W         W',
+    'W         W',
+    'WWWWWWWWWWW'
+    ]
+stage_14 = [
+    'WWWWWiWWWWW',
+    'W   W     W',
+    'W   W   Y W',
+    'W         W',
+    'W   W     W',
+    'W   WWWWX W',
+    'W      W  W',
+    'W R    W  W',
+    'W   WWWW  W',
+    'W   W     W',
+    'WWWWWiWWWWW'
+    ]
+stage_15 = [
+    '    AiWWWWA',
+    '    W     W',
+    '   W      W',
+    '  W       W',
+    ' W    X  W ',
+    'W       W W',
+    'W  T   W  W',
+    'W     W   W',
+    'W    W    W',
+    'W  W      W',
+    'AWWAWiWWWWA'
+    ]
+stage_16 = [
+    'AWWWWiWWWWA',
+    'W         W',
+    'W Z       W',
+    'W         W',
+    'W      W  W',
+    'W     W   W',
+    'W    W    W',
+    'W   W     W',
+    'W  W   S  W',
+    'W W       W',
+    'AWWWWiWWWWA'
+    ]
+stage_17 = [
+    'AWWWWiWWWWA',
+    'W         W',
+    'W     T   W',
+    'W     R   W',
+    'W         W',
+    'W         i',
+    'AWWWW     W',
+    '    W R T W',
+    '    W     W',
+    '    W     W',
+    '    AWWWWWA'
+    ]
+stage_18 = [
+    'AWWWWAWWWWA',
+    'W    W    W',
+    'W  X W    W',
+    'W  WWW    W',
+    'W         W',
+    'i         i',
+    'AWWWW     W',
+    'W   W     W',
+    'W R WWW R W',
+    'W         W',
+    'AWWWWWWWWWA'
+    ]
+stage_19 = [
+    'AWWWWiWWWWA',
+    'W   W     W',
+    'W Y W     W',
+    'W   W R   W',
+    'W  WW     W',
+    'i         W',
+    'AWWWWWWWWWA',
+    '           ',
+    '           ',
+    '           ',
+    '           '
+    ]
+stage_20 = [
+    'AWWWWiWWWWA',
+    'W       W W',
+    'W   W     W',
+    'W T     T W',
+    'W         W',
+    'W     WW  W',
+    'W         W',
+    'W   WWW   W',
+    'W         W',
+    'WXW       W',
+    'AWAWWiWWWWA'
+    ]
+stage_21 = [
+    'AWWWWiWWWWA',
+    'W         W',
+    'W      X  W',
+    'W         W',
+    'W         W',
+    'W W       i',
+    'W  W      W',
+    'W   W     W',
+    'W    W    W',
+    'W   S W   W',
+    'AWWWWWAWWWA'
+    ]
+stage_22 = [
+    'AWWWWWWWWWA',
+    'W         W',
+    'W       T W',
+    'WWWWW W W W',
+    'W   W     W',
+    'i   WX    i',
+    'W   W     W',
+    'W         W',
+    'W         W',
+    'W   T     W',
+    'AWWWWWWWWWA'
+    ]
+stage_23 = [
+    'AWWWWWWWWWA',
+    'W         W',
+    'W     X   W',
+    'W         W',
+    'W  WW WW  W',
+    'i     S   i',
+    'W         W',
+    'W  WWWWW  W',
+    'W     X   W',
+    'W         W',
+    'AWWWWWWWWWA'
+    ]
+stage_24 = [
+    'AWWWWWWWWWA',
+    'W         W',
+    'W  T      W',
+    'W         W',
+    'W  WW      W',
+    'i     T   i',
+    'W   W W W W',
+    'W   W     W',
+    'W   W T   W',
+    'W   W     W',
+    'AWWWWWWWWWA'
+    ]
+stage_25 = [
+    'AWWWWiWWWWA',
+    'W         W',
+    'W         W',
+    'W    S    W',
+    'W         W',
+    'i    i    W',
+    'W         W',
+    'W         W',
+    'W  TT     W',
+    'W         W',
+    'AWWWWWWWWWA',
+    ]
+STAGE_LIST = (
+    [stage_1, stage_2, stage_3, stage_4, stage_5],
+    [stage_6, stage_7, stage_8, stage_9, stage_10],
+    [stage_11, stage_12, stage_13, stage_14, stage_15],
+    [stage_16, stage_17, stage_18, stage_19, stage_20],
+    [stage_21, stage_22, stage_23, stage_24, stage_25]
+    )
+current_stage = []
+checker = True
+# Canvas size
+WIDTH = 440
+HEIGHT = 540
+#lists of entities
+wall_list = []
+fake_wall_list = []
+zombie_list = []
+super_zombie_list = []
+thrower_list = []
+tony_list = []
+flask_list = []
+boss_list = []
+warp_list = []
+health_list = []
+item_list = []
+agar_list = []
+#start of menu classes and functions
+class Scene:
+    
+    def __init__(self, name, buttons, texts):
+        self.name = name
+        self.buttons = buttons
+        self.texts = texts
+    
+    def draw(self, canvas):
+        #only draws buttons if paused or outside game
+        for button in self.buttons:
+            if pause or current_scene != 'skills':
+                button.draw(canvas)
+        #only draws text if paused or outside game
+        for text in self.texts:
+            if pause or current_scene != 'skills':
+                text.draw(canvas)
+                
+class Text:
+    
+    def __init__(self, size, text, colour, position, enabled):
+        self.size = size
+        self.text = text
+        self.colour = colour
+        self.pos = position
+        self.enabled = enabled
+        
+    def draw(self,canvas):
+        canvas.draw_text(self.text, self.pos, self.size, self.colour)
+        
+class Button:
+    def __init__(self, size, text, background_colour, destination, position, text_colour, enabled, text_pos,
+                text_size, border):
+        self.size = size
+        self.text = text
+        self.background_colour = background_colour
+        self.border = border
+        self.destination = destination
+        self.pos = position
+        self.t_colour = text_colour
+        self.enabled = enabled
+        self.t_pos = text_pos
+        self.t_size = text_size
+        
+    def draw(self,canvas):
+        canvas.draw_polygon([(self.pos[0]-self.size[0]/2, self.pos[1]-self.size[1]/2),
+                             (self.pos[0]+self.size[0]/2, self.pos[1]-self.size[1]/2),
+                             (self.pos[0]+self.size[0]/2, self.pos[1]+self.size[1]/2),
+                             (self.pos[0]-self.size[0]/2, self.pos[1]+self.size[1]/2)],
+                            3, self.border, self.background_colour)
+        canvas.draw_text(self.text, self.t_pos, self.t_size, self.t_colour)
+        
+    # selection method for buttons
+    def is_selected(self, click_position):
+        global current_scene
+        # Check whether mouse position is between left and right edges
+        in_x = abs(click_position[0] - self.pos[0]) < self.size[0]/2
+
+        # Check whether mouse position is between top and bottom edges
+        in_y = abs(click_position[1] - self.pos[1]) < self.size[1]/2 
+        
+        # Returns true only if both are true
+        if in_x and in_y:
+            if not game_start or current_scene == 'game over'or current_scene == 'win':
+                current_scene = self.destination
+                #if buttons for the skills are clicked, depending on the button, adds skill
+                #level to the class
+            if current_scene == 'skills':
+                if player.skill_points > 0:
+                    #depending on the button destination, levels your player up
+                    #max level is 10
+                    if self.destination == 'biology':
+                        if player.biology_level <10:
+                            player.biology_level +=1
+                            player.skill_points -=1
+                            self.text = ("Biology level " + str(player.biology_level))
+                    if self.destination == 'chemistry':
+                        if player.chemistry_level <10:
+                            player.chemistry_level +=1
+                            player.skill_points -=1
+                            self.text = ("Chemistry level " + str(player.chemistry_level))
+                    if self.destination == 'physics':
+                        if player.physics_level <10:
+                            player.physics_level +=1
+                            player.skill_points -=1
+                            self.text = ("Physics level " + str(player.physics_level))
+                            #updates physics without constantly updating it
+                            physics.spin_dir = (2 * math.pi)/(50.0- 3.0*player.physics_level)
+
+def mouse_click(pos):
+    #mouse clicking only works if the game is paused or not running
+    for button in draw_scene.buttons:
+        if not game_start or pause:
+            button.is_selected(pos)
+            
+#start of actual game functions
+def stage_to_coords(current_stage):
+    #turns a stage into coordinates
+    for i in range(len(STAGE_LIST[0])):
+        for k in range(len(STAGE_LIST)):
+            if current_stage == STAGE_LIST[i][k]:
+                return i,k
+            
+def new_game():
+    global player, wall_list,fake_wall_list, h_bar, physics, biology, chemistry, exp_bar, sta_bar
+    global button_biology, button_physics, button_chemistry, text_pause_title
+    global scene_skills
+    #summons player
+    player = Character(PLAYER_IMG,
+                       [190, 220],
+                       [0,0], PLAYER_MAX_HEALTH,PLAYER_MAX_HEALTH, hitbox_display)
+    player.exp = PLAYER_STARTING_EXP
+    player.current_level = 0
+    player.skill_points = STARTING_SKILL_POINTS
+    #summons player's physics attack
+    physics = WreckingBall(WRECKINGBALL_DAMAGE, spin_radius, spin, radius)
+    #summons player's biology attack
+    biology = Scalpel(SCALPEL_IMG, SCALPEL_DAMAGE, SCALPEL_SIZE)
+    #summons player's chemistry attack
+    chemistry = ErlenmeyerFlask(FLASK_IMG, FLASK_DAMAGE, FLASK_SIZE,
+                                 FLASK_EXPLOSION_SIZE, FLASK_BURN_DURATION, BURN_DAMAGE,
+                                 'up', player.pos, 'player')
+    #makes sure you can throw a flask
+    chemistry.initialized = False
+    #sets current stage to stage 1
+    current_stage = stage_1
+    Stage(current_stage)
+    Warp_stage(current_stage)
+    #creates the pause menu stuff
+    text_pause_title = Text(50, "Skill points:" + str(player.skill_points),
+                                        "Black", [(WIDTH-text_width("Skill points: 0", 30))/2-50,
+                                                  HEIGHT/2 - 200], True)
+    button_biology = Button([300,100], "Biology level " + str(player.biology_level) ,
+                                "Green", 'biology', [WIDTH/2, HEIGHT/2 - 100],
+          "White", False, [(WIDTH-text_width("Biology level 0", 30))/2, HEIGHT/2-100], 30, "Black")
+    button_physics = Button([300,100], "Physics level " + str(player.biology_level) ,
+                                "Green", 'physics', [WIDTH/2, HEIGHT/2],
+          "White", False, [(WIDTH-text_width("physics level 0", 30))/2, HEIGHT/2], 30, "Black")
+    button_chemistry = Button([300,100], "Chemistry level " + str(player.biology_level) ,
+                                "Green", 'chemistry', [WIDTH/2, HEIGHT/2 + 100],
+          "White", False, [(WIDTH-text_width("chemistry level 0", 30))/2, HEIGHT/2+100], 30, "Black")
+    scene_skills = Scene('skills', [button_biology, button_physics, button_chemistry], [text_pause_title])
+    #creates the status bars
+    h_bar = Player_healthbar(HEIGHT, player.health, player.max_health)
+    exp_bar = Player_expbar(HEIGHT, player.exp, player.level_up_exp, player.current_level)
+    sta_bar = Player_staminabar(HEIGHT, player.stamina, player.total_stamina)
+    #checks to make sure player died
+    checker = True
+#collision functions
+def obj_collision(other_ent_pos, other_ent_left, other_ent_right, other_ent_up,
+                  other_ent_down, ent_pos, ent_vel, ent_state,
+                  ent_left, ent_right, ent_up, ent_down):
+    #if the entity's left or right side is within the other entity
+    if (other_ent_pos[0]+other_ent_right + ent_right> ent_pos[0]
+    and ent_state == "solid"
+    and ent_pos[0] > other_ent_pos[0]-other_ent_left -ent_left):
+        #if the entity's up or down side is within the other entity
+        if (other_ent_pos[1]+other_ent_down + ent_up > ent_pos[1] 
+        and ent_pos[1] > other_ent_pos[1]-other_ent_up- ent_down):
+            return True 
+        
+def dir_collision(ent1_pos, ent1_up, ent1_down, ent1_right, ent1_left,
+                  ent2_pos, ent2_vel, ent2_state, ent2_up, ent2_down, ent2_right, ent2_left,
+                  ent2_up_velocity, ent2_down_velocity):
+        #if the entity's left or right side is within the other entity
+        if (ent1_pos[0]+ent1_right + ent2_left> ent2_pos[0]
+        and ent2_state == "solid"
+        and ent2_pos[0] > ent1_pos[0]-ent1_left -ent2_right):
+            #if the entity's up or down side is within the other entity
+            if (ent1_pos[1]+ent1_down + ent2_up > ent2_pos[1] 
+            and ent2_pos[1] > ent1_pos[1]-ent1_up- ent2_down):
+                
+                #checks if north of wall
+                if (ent1_pos[1] - ent1_up > ent2_pos[1] 
+                and ent2_pos[1] > ent1_pos[1] - ent1_up - ent2_down
+                and ent1_pos[0] - ent1_left - ent2_right < ent2_pos[0]
+                and ent2_pos[0] < ent1_pos[0]+ent1_right+ent2_left):
+                    if(ent2_vel[1] == ent2_down_velocity
+                    or ent2_vel[1] == DOWN_SPRINT_VELOCITY):
+                        return "north"
+                   
+                #checks if south of wall
+                if (ent1_pos[1] + ent1_down  + ent2_up> ent2_pos[1]
+                and ent2_pos[1]> ent1_pos[1] + ent1_down
+                and ent1_pos[0] - ent1_left - ent2_right < ent2_pos[0]
+                and ent2_pos[0] < ent1_pos[0]+ent1_right+ent2_left):
+                    if(ent2_vel[1] == ent2_up_velocity
+                    or ent2_vel[1] == UP_SPRINT_VELOCITY):
+                        return "south"
+                
+                #check if east of wall
+                if (ent1_pos[0] + ent1_right + ent2_left > ent2_pos[0] 
+                and ent2_pos[0] > ent1_pos[0] + ent1_right
+                and ent1_pos[1] + ent1_down + ent2_up> ent2_pos[1]
+                and ent2_pos[1] > ent1_pos[1]-ent1_up -ent2_down):
+                    
+                    return "east"
+
+                #checks if west of wall
+                if (ent1_pos[0] - ent1_left > ent2_pos[0] 
+                and ent2_pos[0] > ent1_pos[0] - ent1_left - ent2_right
+                and ent1_pos[1] + ent1_down + ent2_up> ent2_pos[1]
+                and ent2_pos[1] > ent1_pos[1]-ent1_up -ent2_down):
+                   
+                    return "west"
+                
+def cir_collision(cir_pos,cir_radius,ent_pos, ent_up, ent_down, ent_right, ent_left):
+    #checks if circle in range of block
+    if (ent_pos[1] - ent_up-cir_radius < cir_pos[1]
+    and cir_pos[1]<ent_pos[1]+ent_down+cir_radius):
+        #checks if circle within domain of block
+        if (ent_pos[0]-ent_left-cir_radius < cir_pos[0]
+        and cir_pos[0] < ent_pos[0]+ ent_right + cir_radius):
+            return True
+        else:
+            return False
+    else:
+        return False
+
+#attack classes
+class ErlenmeyerFlask:
+    
+    def __init__(self, image, damage, size, explosion_size, burn_duration, burn_damage, face, position, source):
+        self.img = image
+        self.dmg = damage
+        self.size = size
+        self.exp_size = explosion_size
+        self.burn_dur = burn_duration
+        self.vel = [0,0]
+        self.pos = position
+        self.initialized = False
+        self.time = 0
+        self.spin = 0
+        self.burn_damage = burn_damage
+        self.face = face
+        self.source = source
+        
+    def draw(self, canvas):
+        #initialized makes sure flask isnt active when player is simply walking around
+        
+                #draws flask and allows it to spin
+        canvas.draw_image(self.img, [FLASK_IMG_WIDTH/2, FLASK_IMG_HEIGHT/2],
+                        [FLASK_IMG_WIDTH, FLASK_IMG_HEIGHT],
+                        self.pos,
+                        FLASK_SIZE, self.spin)
+        
+    def update(self):
+        #depending on where the entity is facing when the flask is thrown, its
+        #velocity will change
+        if self.face == "up":
+            if self.initialized:
+                self.vel = [0,-10]
+        elif self.face == "down":
+            if self.initialized:
+                self.vel = [0,10]
+        elif self.face == "left":
+            if self.initialized:
+                self.vel = [-10,0]
+        elif self.face == "right":
+            if self.initialized:
+                self.vel = [10,0]
+        self.time +=1
+        #allows for leveling up system to make more powerful
+        for i in range(2):
+            self.pos[i] = self.vel[i]+self.pos[i]
+        #allows for spinning of flask
+        self.spin += (2*math.pi)/50.0       
+        
+class Scalpel:
+    
+    def __init__(self, image, damage, size):
+        self.dmg = damage
+        self.img = image
+        self.size = size
+        self.healing = 3
+        
+    def draw(self, canvas):
+        #draws scalpel based on the player's faced direction
+        if player.face == "up":
+            self.pos = [player.pos[0], player.pos[1] - 15]
+            canvas.draw_image(self.img, [SCALPEL_IMG_WIDTH/2, SCALPEL_IMG_HEIGHT/2],
+                              [SCALPEL_IMG_WIDTH, SCALPEL_IMG_HEIGHT],
+                              self.pos,
+                              SCALPEL_SIZE)
+            #hitbox of scalpel when vertical
+            self.SCALPEL_COL_X = SCALPEL_SIZE[0]
+            self.SCALPEL_COL_Y = SCALPEL_SIZE[1]
+        elif player.face == "down":
+            self.pos = [player.pos[0], player.pos[1]+ 15]
+            canvas.draw_image(self.img, [SCALPEL_IMG_WIDTH/2, SCALPEL_IMG_HEIGHT/2],
+                              [SCALPEL_IMG_WIDTH, SCALPEL_IMG_HEIGHT],
+                              self.pos,
+                              SCALPEL_SIZE, math.pi)
+            #hitbox of scalpel when vertical
+            self.SCALPEL_COL_X = SCALPEL_SIZE[0]
+            self.SCALPEL_COL_Y = SCALPEL_SIZE[1]
+        elif player.face == "left":
+            self.pos = [player.pos[0]-10, player.pos[1]]
+            canvas.draw_image(self.img, [SCALPEL_IMG_WIDTH/2, SCALPEL_IMG_HEIGHT/2],
+                              [SCALPEL_IMG_WIDTH, SCALPEL_IMG_HEIGHT],
+                              self.pos,
+                              [SCALPEL_SIZE[0],SCALPEL_SIZE[1]], 1.5*math.pi)
+            #hitbox of scalpel when horizontal
+            self.SCALPEL_COL_X = SCALPEL_SIZE[1]
+            self.SCALPEL_COL_Y = SCALPEL_SIZE[0]
+        elif player.face == "right":
+            self.pos = [player.pos[0]+10, player.pos[1]]
+            canvas.draw_image(self.img, [SCALPEL_IMG_WIDTH/2, SCALPEL_IMG_HEIGHT/2],
+                              [SCALPEL_IMG_WIDTH, SCALPEL_IMG_HEIGHT],
+                              self.pos,
+                              [SCALPEL_SIZE[0],SCALPEL_SIZE[1]], 0.5*math.pi)
+            #hitbox of scalpel when horizontal
+            self.SCALPEL_COL_X = SCALPEL_SIZE[1]
+            self.SCALPEL_COL_Y = SCALPEL_SIZE[0]
+            
+    def update(self):
+        #allows for leveling up to power up scalpel
+        self.dmg = SCALPEL_DAMAGE + 5*player.biology_level
+        self.healing = 2 + 1*player.biology_level
+        
+class WreckingBall:
+    
+    def __init__(self, damage, spin_radius, spin, radius):
+        self.dmg = damage
+        self.spin_radius = spin_radius
+        self.spin = spin
+        self.radius = radius
+        self.spin_dir = (2 * math.pi)/50.0
+        #initial position is to the left of the player
+        self.pos = [player.pos[0] + self.spin_radius*math.cos(self.spin),
+             player.pos[1] + self.spin_radius*math.sin(self.spin)]
+        self.stun_time = 20
+        
+    def draw(self, canvas):
+        #draws wrecking ball and the chain
+        canvas.draw_circle(
+            self.pos,
+            self.radius, 
+            3, 
+            "Black",
+            "Black")
+        canvas.draw_line(player.pos,
+                         self.pos,
+                         3, "Black")
+    def update(self):
+        self.dmg = WRECKINGBALL_DAMAGE + 4*player.physics_level
+        self.stun_time = 20 + 2*player.physics_level
+        #call each draw handler update a tick
+        #each tick allows ball to move in a circular motion by using cos and sin functions
+        self.pos = [player.pos[0] + self.spin_radius*math.cos(self.spin),
+             player.pos[1] + self.spin_radius*math.sin(self.spin)]
+        #adds spin so the position updates next tick as well
+        self.spin += self.spin_dir
+#mob class  
+
+class Zombie:
+    
+    def __init__(self, image, position, velocity, velocity_list, health, hitbox, damage, exp_drop):
+        self.img = image
+        self.pos = position
+        self.vel = velocity
+        self.vel_list = velocity_list
+        self.state = "solid"
+        self.face = random.choice(FACES)
+        self.frame = 0
+        self.time = 1
+        self.animated = True
+        self.hitbox = hitbox
+        self.health = health
+        self.invincible = False
+        self.inv_count = 0
+        self.stunned = False
+        self.burn = False
+        self.burn_count = 0
+        self.exp_drop = exp_drop
+        self.damage = damage
+        self.realtime = 0
+        self.realtime_initialized = False
+        self.up = ZOMBIE_UP
+        self.down = ZOMBIE_DOWN
+        self.left = ZOMBIE_LEFT
+        self.right = ZOMBIE_RIGHT
+        self.enemy_type = 'zombie'
+        
+    def draw(self, canvas):   
+        if self.face == "down":
+            #self.time % (number of images to use) + 9-number of images to use
+            #row number-1 *IMG_HEIGHT
+            tile_center = [ZIMAGE_WIDTH/2 + (self.frame%3)*ZIMAGE_WIDTH,
+                           ZIMAGE_HEIGHT/2]
+        elif self.face == "right":
+            tile_center = [ZIMAGE_WIDTH/2 + (self.frame%3)*ZIMAGE_WIDTH,
+                           ZIMAGE_HEIGHT/2 + 1*ZIMAGE_HEIGHT]
+        elif self.face == "up":
+            tile_center = [ZIMAGE_WIDTH/2 + (self.frame%3)*ZIMAGE_WIDTH,
+                           ZIMAGE_HEIGHT/2 + 2*ZIMAGE_HEIGHT]
+        elif self.face == "left":
+            tile_center = [ZIMAGE_WIDTH/2 + (self.frame%3)*ZIMAGE_WIDTH,
+                           ZIMAGE_HEIGHT/2 + 3*ZIMAGE_HEIGHT]
+        #makes it so zombie flashes when invincible
+        if not self.invincible:
+            canvas.draw_image(self.img,
+                          tile_center,
+                          [ZIMAGE_WIDTH,ZIMAGE_HEIGHT],
+                          self.pos,
+                          ZOMBIE_SIZE)
+        elif self.invincible:
+            if self.inv_count%2:
+                canvas.draw_image(self.img,
+                                  tile_center,
+                                  [ZIMAGE_WIDTH,ZIMAGE_HEIGHT],
+                                  self.pos,
+                                  ZOMBIE_SIZE)
+        #draws hitbox if enabled
+        if self.hitbox:
+            canvas.draw_polygon([(self.pos[0]-ZOMBIE_LEFT, self.pos[1]-ZOMBIE_UP),
+                                (self.pos[0]+ZOMBIE_RIGHT, self.pos[1]-ZOMBIE_DOWN),
+                                (self.pos[0]+ZOMBIE_RIGHT, self.pos[1]+ZOMBIE_DOWN),
+                                (self.pos[0]-ZOMBIE_LEFT, self.pos[1]+ZOMBIE_UP)],
+                                2, "Red")
+        #allows zombie to burn
+        if self.burn:
+            canvas.draw_image(BURNING_IMG,
+                              [BURNING_IMG_WIDTH/2, BURNING_IMG_HEIGHT/2],
+                              [BURNING_IMG_WIDTH, BURNING_IMG_HEIGHT],
+                              [self.pos[0], self.pos[1]-10],
+                              BURNING_SIZE)
+        #displays enemy health below them when enabled
+        if enemy_health_display:
+            canvas.draw_text(str(self.health), [self.pos[0]-20, self.pos[1] + 30], 20, "Black")
+    
+    def update(self):
+        #when not stunned, it has a random chance to change direction in a random time
+        if self.animated:
+            current_choice = random.choice(self.vel_list)
+            random_time = random.randrange(80,150)
+            self.time +=1
+            if self.vel[1] != 0:
+                self.pos[1] += self.vel[1]
+            if self.vel[0] != 0:
+                self.pos[0] += self.vel[0]
+            self.frame +=1
+            if self.time % random_time == 0:
+                self.vel = current_choice
+        #invincibility frames after collision
+        if self.invincible:
+            self.inv_count += 1
+            if self.inv_count % 30 == 0:
+                self.invincible = False
+            #makes sure zombie moves again after being stunned
+        if self.realtime_initialized:
+            self.realtime += 1
+        if self.realtime % physics.stun_time == 0:
+            self.animated = True
+            self.realtime = 0
+            self.realtime_initialized = False
+        if self.burn:
+            #allows zombies to take burn damage
+            self.burn_count += 1
+            if self.burn_count % 60 == 0:
+                self.health -= chemistry.burn_damage
+            if self.burn_count % chemistry.burn_dur == 0:
+                self.burn = False
+
+class SuperZombie:
+    
+    def __init__(self, image, position, velocity, health, hitbox, damage, exp_drop):
+        self.img = image
+        self.pos = position
+        self.vel = velocity
+        self.vel_list = SZOMBIE_VEL
+        self.state = "solid"
+        self.face = random.choice(FACES)
+        self.frame = 0
+        self.time = 1
+        self.animated = True
+        self.hitbox = hitbox
+        self.health = health
+        self.invincible = False
+        self.inv_count = 0
+        self.stunned = False
+        self.burn = False
+        self.burn_count = 0
+        self.exp_drop = exp_drop
+        self.damage = damage
+        self.inv_cooldown = 60
+        self.realtime = 0
+        self.realtime_initialized = False
+        self.up = SZOMBIE_UP
+        self.down = SZOMBIE_DOWN
+        self.left = SZOMBIE_LEFT
+        self.right = SZOMBIE_RIGHT
+        self.enemy_type = 'super zombie'
+        
+    def draw(self, canvas):   
+        if self.face == "down":
+            #self.time%(number of images to use) + 9-number of images to use
+            #row number-1 *IMG_HEIGHT
+            tile_center = [SZIMAGE_WIDTH/2 + (self.frame%4)*SZIMAGE_WIDTH,
+                           SZIMAGE_HEIGHT/2]
+        elif self.face == "right":
+            tile_center = [SZIMAGE_WIDTH/2 + (self.frame%4)*SZIMAGE_WIDTH,
+                           SZIMAGE_HEIGHT/2 + 2*SZIMAGE_HEIGHT]
+        elif self.face == "up":
+            tile_center = [SZIMAGE_WIDTH/2 + (self.frame%4)*SZIMAGE_WIDTH,
+                           SZIMAGE_HEIGHT/2 + 3*SZIMAGE_HEIGHT]
+        elif self.face == "left":
+            tile_center = [SZIMAGE_WIDTH/2 + (self.frame%4)*SZIMAGE_WIDTH,
+                           SZIMAGE_HEIGHT/2 + 1*SZIMAGE_HEIGHT]
+        if not self.invincible:
+            canvas.draw_image(self.img,
+                          tile_center,
+                          [SZIMAGE_WIDTH,SZIMAGE_HEIGHT],
+                          self.pos,
+                          SZOMBIE_SIZE)
+        elif self.invincible:
+            if self.inv_count%2:
+                canvas.draw_image(self.img,
+                                  tile_center,
+                                  [SZIMAGE_WIDTH,SZIMAGE_HEIGHT],
+                                  self.pos,
+                                  SZOMBIE_SIZE)
+        if self.hitbox:
+            canvas.draw_polygon([(self.pos[0]-SZOMBIE_LEFT, self.pos[1]-SZOMBIE_UP),
+                                (self.pos[0]+SZOMBIE_RIGHT, self.pos[1]-SZOMBIE_UP),
+                                (self.pos[0]+SZOMBIE_RIGHT, self.pos[1]+SZOMBIE_DOWN),
+                                (self.pos[0]-SZOMBIE_LEFT, self.pos[1]+SZOMBIE_DOWN)],
+                                2, "Red")
+        if self.burn:
+            canvas.draw_image(BURNING_IMG,
+                              [BURNING_IMG_WIDTH/2, BURNING_IMG_HEIGHT/2],
+                              [BURNING_IMG_WIDTH, BURNING_IMG_HEIGHT],
+                              [self.pos[0], self.pos[1]-10],
+                              BURNING_SIZE)
+        if enemy_health_display:
+            canvas.draw_text(str(self.health), [self.pos[0]-20, self.pos[1] + 30], 20, "Black")
+    
+    def update(self):
+        #allows for super zombie to move when animated
+        if self.animated:
+            self.time +=1
+            if self.vel[1] != 0:
+                self.pos[1] += self.vel[1]
+            if self.vel[0] != 0:
+                self.pos[0] += self.vel[0]
+            if self.time % 4 == 0:
+                self.frame +=1
+        #changes the super zombie velocity randomly
+        if self.time%60 == 0:
+            if self.animated:
+                self.vel = random.choice(SZOMBIE_VEL)
+        #invincibility frames after collid
+        if self.invincible:
+            self.inv_count += 1
+            if self.inv_count % self.inv_cooldown == 0:
+                self.invincible = False
+            #makes sure super zombie moves again after being stunned
+        if self.realtime_initialized:
+            self.realtime += 1
+        if self.realtime % physics.stun_time == 0:
+            self.animated = True
+            self.realtime = 0
+            self.realtime_initialized = False
+        if self.burn:
+            #allows super zombies to take burn damage
+            self.burn_count += 1
+            if self.burn_count % 60 == 0:
+                self.health -= chemistry.burn_damage
+            if self.burn_count % chemistry.burn_dur == 0:
+                self.burn = False
+
+class FlaskThrower:
+    
+    def __init__(self, image, position, velocity,health, hitbox, damage, flask_damage, exp_drop):
+        self.img = image
+        self.pos = position
+        self.vel = velocity
+        self.vel_list = THROWER_VEL
+        self.state = "solid"
+        self.face = random.choice(FACES)
+        self.frame = 0
+        self.time = 1
+        self.animated = True
+        self.hitbox = hitbox
+        self.health = health
+        self.invincible = False
+        self.inv_count = 0
+        self.stunned = False
+        self.burn = False
+        self.burn_count = 0
+        self.exp_drop = exp_drop
+        self.damage = damage
+        self.flask_damage = flask_damage
+        self.initialized = False
+        self.realtime = 0
+        self.realtime_initialized = False
+        self.up = THROWER_UP
+        self.down = THROWER_DOWN
+        self.left = THROWER_LEFT
+        self.right = THROWER_RIGHT
+        self.enemy_type = 'thrower'
+        
+    def shoot(self):
+        #when shoot is called, summons a flask
+        enemy_flask = ErlenmeyerFlask(FLASK_IMG, self.flask_damage, FLASK_SIZE,
+                                       FLASK_EXPLOSION_SIZE, FLASK_BURN_DURATION, BURN_DAMAGE,
+                                       self.face, [self.pos[0], self.pos[1]],'enemy')
+        self.initialized = True
+        #checks to see which direction to shoot flask
+        if self.face == "down":
+            enemy_flask.vel = [0,10]
+        elif self.face == "right":
+            enemy_flask.vel = [10,0]
+        elif self.face == "up":
+            enemy_flask.vel = [0,-10]
+        elif self.face == "left":
+            enemy_flask.vel = [-10,0]
+        enemy_flask.face = self.face
+        chemistry_list.append(enemy_flask)
+        
+    def draw(self, canvas):
+        #checks direction entity is facing to animate accordingly
+        if self.face == "down":
+            #self.time%(number of images to use) + 9-number of images to use
+            #row number-1 *IMG_HEIGHT
+            tile_center = [THROWER_IMG_WIDTH/2 + (self.frame%3)*THROWER_IMG_WIDTH,
+                           THROWER_IMG_HEIGHT/2 + 4*THROWER_IMG_HEIGHT]
+        elif self.face == "right":
+            tile_center = [THROWER_IMG_WIDTH/2 + (self.frame%3)*THROWER_IMG_WIDTH,
+                           THROWER_IMG_HEIGHT/2 + 6*THROWER_IMG_HEIGHT]
+        elif self.face == "up":
+            tile_center = [THROWER_IMG_WIDTH/2 + (self.frame%3)*THROWER_IMG_WIDTH,
+                           THROWER_IMG_HEIGHT/2 + 7*THROWER_IMG_HEIGHT]
+        elif self.face == "left":
+            tile_center = [THROWER_IMG_WIDTH/2 + (self.frame%3)*THROWER_IMG_WIDTH,
+                           THROWER_IMG_HEIGHT/2 + 5*THROWER_IMG_HEIGHT]
+        #makes it so entity flashes when invincible
+        if not self.invincible:
+            canvas.draw_image(self.img,
+                          tile_center,
+                          [THROWER_IMG_WIDTH,THROWER_IMG_HEIGHT],
+                          self.pos,
+                          THROWER_SIZE)
+        elif self.invincible:
+            if self.inv_count%2:
+                canvas.draw_image(self.img,
+                          tile_center,
+                          [THROWER_IMG_WIDTH,THROWER_IMG_HEIGHT],
+                          self.pos,
+                          THROWER_SIZE)
+        #draws hitbox if enabled
+        if self.hitbox:
+            canvas.draw_polygon([(self.pos[0]-THROWER_LEFT, self.pos[1]-THROWER_UP),
+                                (self.pos[0]+THROWER_RIGHT, self.pos[1]-THROWER_UP),
+                                (self.pos[0]+THROWER_RIGHT, self.pos[1]+THROWER_DOWN),
+                                (self.pos[0]-THROWER_LEFT, self.pos[1]+THROWER_DOWN)],
+                                2, "Red")
+        #displays enemy health below them when enabled
+        if enemy_health_display:
+            canvas.draw_text(str(self.health), [self.pos[0]-20, self.pos[1] + 30], 20, "Black")
+            
+    def update(self):
+        #makes sure facing right direction
+        if self.vel[1] < 0:
+            self.face = "up"
+        if self.vel[1] > 0:
+            self.face = "down"
+        if self.vel[0] < 0:
+            self.face = "left"
+        if self.vel[0] > 0:
+            self.face = "right"
+        #when not stunned, it has a random chance to change direction in a random time
+        if self.animated:
+            current_choice = random.choice(THROWER_VEL)
+            random_time = random.randrange(80,150)
+            self.time +=1
+            for i in range(2):
+                if self.vel[i] != 0:
+                    self.pos[i] += self.vel[i]
+            if self.time % 4 == 0:
+                self.frame +=1   
+            if self.time % random_time == 0:
+                self.vel = current_choice
+                #shoots whenever switches direction
+                self.shoot()
+        #invincibility frames after collision
+        if self.invincible:
+            self.inv_count += 1
+            if self.inv_count % 30 == 0:
+                self.invincible = False
+            #makes sure zombie moves again after being stunned
+        if self.realtime_initialized:
+            self.realtime += 1
+        if self.realtime % physics.stun_time == 0:
+            self.animated = True
+            self.realtime = 0
+            self.realtime_initialized = False
+            
+class Tony:
+    
+    def __init__ (self, image, position, velocity,health, hitbox, damage, exp_drop):
+        self.img = image
+        self.pos = position
+        self.vel = velocity
+        self.vel_list = TONY_VEL
+        self.state = "solid"
+        self.face = random.choice(FACES)
+        self.frame = 0
+        self.time = 1
+        self.animated = True
+        self.hitbox = hitbox
+        self.health = health
+        self.invincible = False
+        self.inv_count = 0
+        self.stunned = False
+        self.burn = False
+        self.burn_count = 0
+        self.exp_drop = exp_drop
+        self.damage = damage
+        self.initialized = False
+        self.realtime = 0
+        self.realtime_initialized = False
+        self.up = TONY_UP
+        self.down = TONY_DOWN
+        self.left = TONY_LEFT
+        self.right = TONY_RIGHT
+        self.enemy_type = 'tony'
+        
+    def shoot(self):
+        #allows for Tony to shoot chemistry
+        enemy_flask = ErlenmeyerFlask(FLASK_IMG, FLASK_DAMAGE, FLASK_SIZE,
+                                       FLASK_EXPLOSION_SIZE, FLASK_BURN_DURATION, BURN_DAMAGE,
+                                       self.face, [self.pos[0], self.pos[1]],'enemy')
+        self.initialized = True
+        #Tony shoots flask faster than normal
+        #allows for flask direction to be based upon what direction
+        #Tony is facing
+        if self.face == "down":
+            enemy_flask.vel = [0,15]
+        elif self.face == "right":
+            enemy_flask.vel = [15,0]
+        elif self.face == "up":
+            enemy_flask.vel = [0,-15]
+        elif self.face == "left":
+            enemy_flask.vel = [-15,0]
+        enemy_flask.face = self.face
+        chemistry_list.append(enemy_flask)
+        
+    def draw(self, canvas):
+        tile_center = [TONY_IMG_WIDTH/2,TONY_IMG_HEIGHT/2]
+        #makes it so Tony flashes when invincible
+        if not self.invincible:
+            if self.time % 5 == 0 or self.time % 6 == 0:
+                self.img = TONY2_IMG
+            else:
+                self.img = TONY_IMG
+            canvas.draw_image(self.img,
+                          tile_center,
+                          [TONY_IMG_WIDTH, TONY_IMG_HEIGHT],
+                          self.pos,
+                          TONY_SIZE)
+        elif self.invincible:
+            if self.inv_count%2:
+                canvas.draw_image(self.img,
+                          tile_center,
+                          [TONY_IMG_WIDTH, TONY_IMG_HEIGHT],
+                          self.pos,
+                          TONY_SIZE)
+        #draws hitbox if enabled
+        if self.hitbox:
+            canvas.draw_polygon([(self.pos[0]-TONY_LEFT, self.pos[1]-TONY_UP),
+                                (self.pos[0]+TONY_RIGHT, self.pos[1]-TONY_UP),
+                                (self.pos[0]+TONY_RIGHT, self.pos[1]+TONY_DOWN),
+                                (self.pos[0]-TONY_LEFT, self.pos[1]+TONY_DOWN)],
+                                2, "Red")
+        #allows zombie to burn
+        if self.burn:
+            canvas.draw_image(BURNING_IMG,
+                              [BURNING_IMG_WIDTH/2, BURNING_IMG_HEIGHT/2],
+                              [BURNING_IMG_WIDTH, BURNING_IMG_HEIGHT],
+                              [self.pos[0], self.pos[1]-10],
+                              BURNING_SIZE)
+        #displays enemy health below them when enabled
+        if enemy_health_display:
+            canvas.draw_text(str(self.health), [self.pos[0]-20, self.pos[1] + 30], 20, "Black")
+            
+    def update(self):
+        #makes sure facing right direction
+        if self.vel[1] < 0:
+            self.face = "up"
+        if self.vel[1] > 0:
+            self.face = "down"
+        if self.vel[0] < 0:
+            self.face = "left"
+        if self.vel[0] > 0:
+            self.face = "right"
+        #when not stunned, it has a random chance to change direction in a random time
+        if self.animated:
+            current_choice = random.choice(TONY_VEL)
+            random_time = random.randrange(80,150)
+            self.time +=1
+            for i in range(2):
+                if self.vel[i] != 0:
+                    self.pos[i] += self.vel[i]
+            if self.time % 4 == 0:
+                self.frame +=1   
+            if self.time % random_time == 0:
+                self.vel = current_choice
+                #shoots whenever switches direction
+                self.shoot()
+        #invincibility frames after collision
+        if self.invincible:
+            self.inv_count += 1
+            if self.inv_count % 30 == 0:
+                self.invincible = False
+            #makes sure Tony moves again after being stunned
+        if self.realtime_initialized:
+            self.realtime += 1
+        if self.realtime % (physics.stun_time/2) == 0:
+            self.animated = True
+            self.realtime = 0
+            self.realtime_initialized = False
+    
+#player class                
+class Character:
+    
+    def __init__(self, image, position, velocity, health,max_health, hitbox):
+        self.image = image
+        self.pos = position
+        self.vel = velocity
+        self.animated = False
+        self.time = 0
+        self.frame = 0
+        self.sprint_count = 0
+        self.face = "up"
+        self.state = "solid"
+        self.health = health
+        self.invincible = False
+        self.inv_count = 0
+        self.hitbox = hitbox
+        self.physics = False
+        self.biology = False
+        self.chemistry = False
+        self.burn = False
+        self.burn_count = 0
+        self.health = health
+        self.max_health = max_health
+        self.exp = 0
+        self.current_level = 1
+        self.level_up_exp = self.current_level*100
+        self.stamina = 100
+        self.total_stamina = 100
+        self.sprint = False
+        self.stamina_recovery = 100
+        self.stamina_consumption = 20
+        self.skill_points = 0
+        self.biology_level = 0
+        self.physics_level = 0
+        self.chemistry_level = 0
+        self.force_field = False
+        self.shielding = 1
+        self.force_counter = 0
+        self.aura = False
+        self.aura_healing = 3
+        self.aura_timer = 0
+    def draw(self, canvas): 
+        #if healing aura activated, draws aura
+        if self.aura:
+            canvas.draw_image(AURA_IMG,
+                              [AURA_IMG_SIZE[0]/2,AURA_IMG_SIZE[1]/2],
+                              [AURA_IMG_SIZE[0],AURA_IMG_SIZE[1]],
+                              self.pos,
+                              AURA_SIZE)
+            canvas.draw_image(AURA_BUFF_IMG,
+                              [AURA_BUFF_IMG_SIZE[0]/2,AURA_BUFF_IMG_SIZE[1]/2],
+                              [AURA_BUFF_IMG_SIZE[0],AURA_BUFF_IMG_SIZE[1]],
+                              [WIDTH/2 + 50, HEIGHT - 60],
+                              AURA_BUFF_SIZE)
+        #animates player based on direction they're facing
+        if self.face == "up":
+            #self.time%(number of images to use) + 9-number of images to use
+            #row number-1 *IMG_HEIGHT
+            tile_center = [PLAYER_IMG_WIDTH/2 + (self.time%4)*PLAYER_IMG_WIDTH,
+                           PLAYER_IMG_HEIGHT/2 + 3*PLAYER_IMG_HEIGHT]
+        elif self.face == "left":
+            tile_center = [PLAYER_IMG_WIDTH/2 + (self.time%4)*PLAYER_IMG_WIDTH,
+                           PLAYER_IMG_HEIGHT/2 + 1*PLAYER_IMG_HEIGHT]
+        elif self.face == "down":
+            tile_center = [PLAYER_IMG_WIDTH/2 + (self.time%4)*PLAYER_IMG_WIDTH,
+                           PLAYER_IMG_HEIGHT/2 + 0*PLAYER_IMG_HEIGHT]
+        elif self.face == "right":
+            tile_center = [PLAYER_IMG_WIDTH/2 + (self.time%4)*PLAYER_IMG_WIDTH,
+                           PLAYER_IMG_HEIGHT/2 + 2*PLAYER_IMG_HEIGHT]
+        canvas.draw_image(self.image,
+                          tile_center,
+                          [PLAYER_IMG_WIDTH,PLAYER_IMG_HEIGHT],
+                          self.pos,
+                          PLAYER_SIZE)
+        #if burning, draws a fire emoji above head
+        if self.burn:
+            canvas.draw_image(BURNING_IMG,
+                              [BURNING_IMG_WIDTH/2, BURNING_IMG_HEIGHT/2],
+                              [BURNING_IMG_WIDTH, BURNING_IMG_HEIGHT],
+                              [self.pos[0], self.pos[1]-10],
+                              BURNING_SIZE)
+            canvas.draw_image(BURNING_IMG,
+                              [BURNING_IMG_WIDTH/2, BURNING_IMG_HEIGHT/2],
+                              [BURNING_IMG_WIDTH, BURNING_IMG_HEIGHT],
+                              [WIDTH/2 + 30, HEIGHT - 60],
+                              FORCE_FIELD_BUFF_SIZE)
+        #if force field activated, draws force field
+        if self.force_field:
+            canvas.draw_image(FORCE_FIELD_IMG,
+                              [FORCE_FIELD_IMG_SIZE[0]/2,FORCE_FIELD_IMG_SIZE[1]/2],
+                              [FORCE_FIELD_IMG_SIZE[0],FORCE_FIELD_IMG_SIZE[1]],
+                              self.pos,
+                              FORCE_FIELD_SIZE)
+            canvas.draw_image(FORCE_FIELD_BUFF_IMG,
+                              [FORCE_FIELD_BUFF_IMG_SIZE[0]/2,FORCE_FIELD_BUFF_IMG_SIZE[1]/2],
+                              [FORCE_FIELD_BUFF_IMG_SIZE[0],FORCE_FIELD_BUFF_IMG_SIZE[1]],
+                              [WIDTH/2 + 10, HEIGHT - 60],
+                              FORCE_FIELD_BUFF_SIZE)
+        #hitbox draws if allowed
+        if self.hitbox:
+            canvas.draw_polygon([(self.pos[0]-PLAYER_LEFT, self.pos[1]-PLAYER_UP),
+                                (self.pos[0]+PLAYER_RIGHT, self.pos[1]-PLAYER_UP),
+                                (self.pos[0]+PLAYER_RIGHT, self.pos[1]+PLAYER_DOWN),
+                                (self.pos[0]-PLAYER_LEFT, self.pos[1]+PLAYER_DOWN)],
+                                2, "Green")
+        
+    def update(self):
+        global game_start, wall_list, fake_wall_list, zombie_list, warp_list, current_scene, super_zombie_list, thrower_list, tony_list
+        global checker
+        #allows for animation of character
+        if self.animated:
+            self.frame +=1
+            if self.frame %4 == 0:
+                self.time += 1
+                #Repeat after full cycle of 16
+                self.time %= 9
+        if self.vel[1] != 0:
+            self.pos[1] += self.vel[1]
+        if self.vel[0] != 0:
+            self.pos[0] += self.vel[0]
+        #changes the face depeding on the velocity of the player
+        if self.vel[0]==LEFT_VELOCITY:
+            if self.vel[1] == 0:
+                self.face = "left"
+        if self.vel[0]==RIGHT_VELOCITY:
+            if self.vel[1] == 0:
+                self.face = "right"
+        if self.vel[1]==UP_VELOCITY:
+            if self.vel[0]== 0:
+                self.face = "up"
+        if self.vel[1]==DOWN_VELOCITY:
+            if self.vel[0]== 0:
+                self.face = "down"
+        #invincibility frames after collision
+        if self.invincible:
+            self.inv_count += 1
+            if self.inv_count % 60 == 0:
+                self.invincible = False
+        #damage reduction for force force field
+        if self.force_field:
+            self.shielding = (SHIELDING - 10 * (player.physics_level-5))*0.01
+            self.force_counter += 1
+            if self.force_counter % 60*(player.physics_level-4) == 0:
+                self.force_field = False
+                self.shielding = 1
+        #healing for aura
+        if self.aura:
+            self.aura_counter += 1
+            if self.aura_counter % 30 == 0:
+                self.health += self.aura_healing
+            if self.aura_counter % (30 + (player.biology_level-5)*30) == 0:
+                self.aura = False
+            
+        #allows players to take burn damage
+        if self.burn:
+            self.burn_count += 1
+            if self.burn_count % 60 == 0:
+                if self.chemistry_level < 5:
+                    self.health -= chemistry.burn_damage - 2* self.chemistry_level
+            if self.burn_count % chemistry.burn_dur == 0:
+                self.burn = False
+        #sprint meter
+        #if stamina is less than zero stop sprinting
+        if self.stamina <= 0:
+            self.sprint = False
+            self.stanima = 0
+            if UP_SPRINT_VELOCITY in self.vel:
+                if UP_SPRINT_VELOCITY == self.vel[0]:
+                    self.vel[0] = UP_VELOCITY
+                if UP_SPRINT_VELOCITY == self.vel[1]:
+                    self.vel[1] = UP_VELOCITY
+            if DOWN_SPRINT_VELOCITY in self.vel:
+                if DOWN_SPRINT_VELOCITY == self.vel[0]:
+                    self.vel[0] = DOWN_VELOCITY
+                if DOWN_SPRINT_VELOCITY == self.vel[1]:
+                    self.vel[1] = DOWN_VELOCITY
+        #if sprinting and moving: sprint
+        if self.sprint:
+            if not self.vel == [0,0]:
+                self.sprint_count -= 1
+            if self.sprint_count %self.stamina_consumption == 0:
+                self.stamina -= 10
+            if UP_VELOCITY in self.vel:
+                if UP_VELOCITY == self.vel[0]:
+                    self.vel[0] = UP_SPRINT_VELOCITY
+                if UP_VELOCITY == self.vel[1]:
+                    self.vel[1] = UP_SPRINT_VELOCITY
+            if DOWN_VELOCITY in self.vel:
+                if DOWN_VELOCITY == self.vel[0]:
+                    self.vel[0] = DOWN_SPRINT_VELOCITY
+                if DOWN_VELOCITY == self.vel[1]:
+                    self.vel[1] = DOWN_SPRINT_VELOCITY
+        #makes sure player is sprinting
+        if not self.sprint:
+            self.sprint_count += 1
+            if UP_SPRINT_VELOCITY in self.vel:
+                if UP_SPRINT_VELOCITY == self.vel[0]:
+                    self.vel[0] = UP_VELOCITY
+                if UP_SPRINT_VELOCITY == self.vel[1]:
+                    self.vel[1] = UP_VELOCITY
+            if DOWN_SPRINT_VELOCITY in self.vel:
+                if DOWN_SPRINT_VELOCITY == self.vel[0]:
+                    self.vel[0] = DOWN_VELOCITY
+                if DOWN_SPRINT_VELOCITY == self.vel[1]:
+                    self.vel[1] = DOWN_VELOCITY
+            if self.stamina < 100:
+                if self.vel == [0,0]:
+                    if self.sprint_count %(self.stamina_recovery -50) == 0:
+                        self.stamina += 10
+                elif self.sprint_count %self.stamina_recovery == 0:
+                        self.stamina += 10
+        #level up part of player
+        if self.exp >= self.level_up_exp:
+                            self.exp -= self.level_up_exp
+                            self.current_level += 1
+                            self.skill_points += 1
+                            self.level_up_exp = self.current_level*100
+                            self.max_health += 20
+                            self.health = self.max_health
+                            h_bar.tot_health = self.max_health  
+                            sta_bar.tstamina = self.total_stamina
+        #if player dies, goes back to menu, clears board
+        if player.health <= 0:
+            if not checker:
+                wall_list = []
+                fake_wall_list = []
+                zombie_list = []
+                super_zombie_list = []
+                tony_list = []
+                thrower_list = []
+                flask_list = []
+                warp_list = []
+                health_list = []
+                item_list = []
+                tony_list = []
+                checker = True
+                current_scene = 'game over'
+                game_start = False
+        #if player's health is greater than max, goes to max
+        if self.health >= self.max_health:
+            self.health = self.max_health
+            
+#status bar classes                
+class Player_healthbar:
+    
+    def __init__(self, frame_bottom, player_health, total_health):
+        self.frame_b = frame_bottom
+        self.health = player_health
+        self.tot_health = total_health
+        
+    def draw(self, canvas):
+        self.health = float(player.health)
+        #draws the health bar frame
+        canvas.draw_polygon([[0, self.frame_b],
+                             [0, self.frame_b - 22],
+                             [202, self.frame_b - 22],
+                             [202, self.frame_b]
+                             ],
+                             4, "Black")
+        #when not invincible, player health bar is green
+        if not player.invincible:
+            
+            canvas.draw_polygon([[1, self.frame_b-1],
+                                [1, self.frame_b - 21],
+                                [(float(self.health)/self.tot_health)*200+1, self.frame_b - 21],
+                                [(float(self.health)/self.tot_health)*200+1, self.frame_b-1]],
+                                 1, "Green", "Green")
+        #when invincible, player health bar is red
+        elif player.invincible:
+            canvas.draw_polygon([[1, self.frame_b-1],
+                                [1, self.frame_b - 21],
+                                [(float(self.health)/self.tot_health)*200+1, self.frame_b - 21],
+                                [(float(self.health)/self.tot_health)*200+1, self.frame_b-1]],
+                                 1, "Red", "Red")
+        #allows player to see health in number instead of just a bar
+        canvas.draw_text("Health:" + str(float(self.health)) + "/" + str(self.tot_health),[0, self.frame_b-30], 20, "Black")
+
+class Player_staminabar:
+    
+    def __init__(self, frame_bottom, player_stamina, total_stamina):
+        self.frame_b = frame_bottom
+        self.stamina = player_stamina
+        self.tstamina = total_stamina
+        
+    def draw(self, canvas):
+        #makes sure what's displayed is the float stamina
+        self.stamina = float(player.stamina)
+        #draws frame
+        canvas.draw_polygon([[211, self.frame_b],
+                             [211, self.frame_b - 22],
+                             [413, self.frame_b - 22],
+                             [413, self.frame_b]
+                             ],
+                             4, "Black")
+        #draws actual stamina bar
+        canvas.draw_polygon([[212, self.frame_b-1],
+                                [212, self.frame_b - 21],
+                                [(self.stamina/self.tstamina)*200+211, self.frame_b - 21],
+                                [(self.stamina/self.tstamina)*200+211, self.frame_b-1]],
+                                 1, "Orange", "Orange")
+        
+        #draws numerical representation of stamina
+        canvas.draw_text("Stamina:" + str(int(self.stamina)) + "/" + str(self.tstamina),[207, self.frame_b-30], 20, "Black")
+   
+    def update(self):
+        self.stamina = player.stamina
+        self.tstamina = player.total_stamina
+            
+class Player_expbar:
+    
+    def __init__(self, frame_bottom, player_exp, level_up_exp, current_level):
+        self.frame_b = frame_bottom
+        self.exp = player_exp
+        self.lvl_exp = level_up_exp
+        self.c_level = current_level
+        
+    def draw(self, canvas):
+        #draws the frame
+        canvas.draw_polygon([[0, self.frame_b-50],
+                             [0, self.frame_b - 72],
+                             [202, self.frame_b - 72],
+                             [202, self.frame_b-50]
+                             ],
+                             4, "Black")
+        #draws the exp bar
+        canvas.draw_polygon([[1, self.frame_b-51],
+                                [1, self.frame_b - 71],
+                                [(float(self.exp)/self.lvl_exp)*200+1, self.frame_b - 71],
+                                [(float(self.exp)/self.lvl_exp)*200+1, self.frame_b-51]],
+                                 1, "Blue", "Blue")
+        canvas.draw_text("Level:" + str(self.c_level),[0, self.frame_b-80], 20, "Black")
+    
+    def update(self):
+        self.exp = player.exp
+        self.lvl_exp = player.level_up_exp
+        self.c_level = player.current_level
+
+#item classes
+class Healthpack:
+    
+    def __init__ (self, recovered_health, size, image, position, image_size):
+        self.health = recovered_health
+        self.size = size
+        self.img = image
+        self.pos = position
+        self.img_size = image_size
+        
+    def draw(self, canvas):
+        #draws the actual health pack
+        canvas.draw_image(self.img, [self.img_size[0]/2,self.img_size[1]/2],
+                          self.img_size, self.pos, self.size)
+            
+class Item:
+    def __init__ (self, status, size, image, position, image_size):
+        self.status = status
+        self.size = size
+        self.img = image
+        self.pos = position
+        self.img_size = image_size
+    def draw(self, canvas):
+        canvas.draw_image(self.img, [self.img_size[0]/2,self.img_size[1]/2],
+                          self.img_size, self.pos, self.size)
+
+#world classes (affect blocks, warps, and actual stage)
+class Stage:
+    
+    def __init__(self, current_stage):
+        x = BLOCK_SIZE[0]/2
+        y = BLOCK_SIZE[1]/2
+        for row in current_stage:
+            for col in row:
+                #if letter is in the list, it will spawn the thing in position x y 
+                if col == 'A':
+                    fake_wall_list.append(Wall(WALL1_IMG, [x,y], (BLOCK_SIZE)))
+                if col == "W":
+                    wall_list.append(Wall(WALL1_IMG, [x, y],(BLOCK_SIZE)))
+                if col == "Z":
+                    zombie_list.append(Zombie(ZOMBIE_IMG, [x,y], (random.choice(ZOMBIE_VEL)),ZOMBIE_VEL,
+                                                                ZOMBIE_HEALTH, hitbox_display, 10, 10))
+                if col == "X":
+                    zombie_list.append(Zombie(ZOMBIE_IMG, [x,y], (random.choice(ZOMBIE2_VEL)),ZOMBIE2_VEL,
+                                                                ZOMBIE2_HEALTH, hitbox_display, 30, ZOMBIE2_EXP))
+                if col == "S":
+                    super_zombie_list.append(SuperZombie(SZOMBIE_IMG, [x,y],
+                                                          (random.choice(SZOMBIE_VEL)),
+                                                          SUPER_ZOMBIE_HEALTH, hitbox_display, SUPER_ZOMBIE_DAMAGE, SUPER_ZOMBIE_EXP))
+                if col == "Y":
+                    super_zombie_list.append(SuperZombie(SZOMBIE_IMG, [x,y],
+                                                          (random.choice(SZOMBIE_VEL)),
+                                                          SUPER_ZOMBIE2_HEALTH, hitbox_display, SUPER_ZOMBIE2_DAMAGE, SUPER_ZOMBIE2_EXP))
+                if col == 'T':
+                    thrower_list.append(FlaskThrower(THROWER_IMG, [x,y],
+                                                      random.choice(THROWER_VEL),
+                                                      THROWER_HEALTH, hitbox_display, THROWER_DAMAGE,THROWER_FLASK_DAMAGE, 60))
+                if col == 'R':
+                    thrower_list.append(FlaskThrower(THROWER_IMG, [x,y],
+                                                      random.choice(THROWER_VEL),
+                                                      THROWER2_HEALTH, hitbox_display,THROWER2_DAMAGE,THROWER2_FLASK_DAMAGE, 60))
+                if col == 'B':
+                    tony_list.append(Tony(TONY_IMG, [x,y],
+                                                      random.choice(TONY_VEL),
+                                                      TONY_HEALTH, hitbox_display, 50, 6000))
+                x += BLOCK_SIZE[0]
+            y += BLOCK_SIZE[1]
+            x = BLOCK_SIZE[0]/2
+
+class Warp:
+    
+    def __init__(self, image, position, warp_location, stage, warp_type):
+        self.img = image
+        self.pos = position
+        self.warp_loci = warp_location
+        self.stage = stage
+        self.warp_type = warp_type
+        self.size = BLOCK_SIZE
+    def draw(self, canvas):
+        #spawns and draws the warps
+        canvas.draw_image(self.img,
+                          (480/2, 430/2),
+                          (480, 430),
+                          self.pos,
+                          BLOCK_SIZE)            
+            
+class Wall:
+    
+    def __init__(self, image, position, size):
+        self.IMG = image
+        self.pos = position
+        self.size = size
+    
+    def draw(self, canvas):
+        #spawns and draws the walls
+        canvas.draw_image(self.IMG,
+                          (self.IMG.get_width()/2, self.IMG.get_width()/2),
+                          (self.IMG.get_width(), self.IMG.get_width()),
+                          self.pos,
+                          self.size)
+        
+class Warp_stage:
+    
+    def __init__(self, current_stage):
+        x = BLOCK_SIZE[0]/2
+        y = BLOCK_SIZE[1]/2
+        for row in current_stage:
+            for col in row:
+                if col == "i":
+                    #checks if portal is the top portal
+                    if y == BLOCK_SIZE[1]/2:
+                        #if portal is the top portal, makes it so that portal sends to upper stage
+                        current_stage_coords = stage_to_coords(current_stage)
+                        warp_list.append(Warp(WARP_IMG, [x,y], [x,HEIGHT-STAT_HEIGHT-int(1.5*BLOCK_SIZE[1])],STAGE_LIST[current_stage_coords[0]-1][current_stage_coords[1]], "up" ))
+                    #checks if portal is in the middle of y axis
+                    if y == int(5.5*BLOCK_SIZE[1]):
+                        #checks if portal is left portal
+                        if x == BLOCK_SIZE[0]/2:
+                            #if portal is left portal, portal sends player to left stage
+                            current_stage_coords = stage_to_coords(current_stage)
+                            warp_list.append(Warp(WARP_IMG, [x,y], [WIDTH-(1.5*BLOCK_SIZE[0]), y], STAGE_LIST[current_stage_coords[0]][current_stage_coords[1]-1],"left"))
+                        #checks if portal is right portal
+                        elif x == WIDTH-BLOCK_SIZE[0]/2:
+                            #if portal is right portal, portal sends player to right stage
+                            current_stage_coords = stage_to_coords(current_stage)
+                            warp_list.append(Warp(WARP_IMG, [x,y], [int(1.5*BLOCK_SIZE[0]), y], STAGE_LIST[current_stage_coords[0]][current_stage_coords[1]+1],"right"))
+                        #checks if portal is center portal
+                        elif x == WIDTH/2:
+                            if current_stage == stage_25:
+                                #if portal is the next ring in stage 25, sends to next ring
+                                current_stage_coords = stage_to_coords(current_stage)
+                                warp_list.append(Warp(WARP_IMG, [x,y], [WIDTH/2, y], STAGE_LIST[current_stage_coords[0]-1][current_stage_coords[1]-1],"center"))
+                            elif current_stage == stage_7:
+                                current_stage_coords = stage_to_coords(current_stage)
+                                warp_list.append(Warp(WARP_IMG, [x,y], [WIDTH/2, y], STAGE_LIST[current_stage_coords[0]+1][current_stage_coords[1]+1],"center"))
+                    #checks if portal is the bottom portal
+                    if y == HEIGHT - STAT_HEIGHT - BLOCK_SIZE[1]/2:
+                        current_stage_coords = stage_to_coords(current_stage)
+                        warp_list.append(Warp(WARP_IMG, [x,y], [x,int(1.5*BLOCK_SIZE[1])],STAGE_LIST[current_stage_coords[0]+1][current_stage_coords[1]],"down" ))
+                x += BLOCK_SIZE[0]
+            y += BLOCK_SIZE[1]
+            x = BLOCK_SIZE[0]/2
+               
+def draw(canvas):
+    global wall_list, zombie_list, warp_list, wreck_timer, super_zombie_list, thrower_list, tony_list,fake_wall_list
+    global current_scene, game_start, draw_scene, checker, scene_skills
+    global health_list, item_list
+    #all these if statements draw the current scene and any background it needs
+    if current_scene == 'game over':
+        draw_scene = scene_game_over
+        frame.set_canvas_background("Black")
+    if current_scene == 'win':
+        draw_scene = scene_win
+        frame.set_canvas_background("White")
+    if current_scene == 'help':
+        draw_scene = scene_help
+        canvas.draw_image(start_background, [start_background.get_width()/2,start_background.get_height()/2], [start_background.get_width(),start_background.get_height()], [WIDTH/2, HEIGHT/2],
+                          [WIDTH,HEIGHT])
+        canvas.draw_polygon(([0,40],[WIDTH,40],
+                               [WIDTH,290], [0,290]),
+                            3,"White",'White')
+    if current_scene == 'menu':
+        draw_scene = scene_menu
+        frame.set_canvas_background("White")
+        canvas.draw_image(start_background, [START_BACKGROUND_WIDTH/2,START_BACKGROUND_HEIGHT/2], [START_BACKGROUND_WIDTH,START_BACKGROUND_HEIGHT], [WIDTH/2, HEIGHT/2],
+                          [WIDTH,HEIGHT])
+    if current_scene == 'start':
+        game_start = True
+        frame.set_canvas_background("#f0ead6")
+        if checker:
+            new_game()
+            #checker = false allows game to make sure player is
+            #not mistaken as dead when respawning
+            checker = False
+
+    if current_scene == 'skills':
+        text_pause_title.text = ("Skill points:" + str(player.skill_points))
+        draw_scene = scene_skills
+    #if the game has not started or the game is in the skills tab
+    if not game_start or current_scene == 'skills':
+        draw_scene.draw(canvas)
+    #if the game is not paused and has started then everything runs
+    if game_start and not pause:
+        enemies_list = [zombie_list, super_zombie_list, thrower_list, tony_list]
+        burnable_enemies_list = [zombie_list, super_zombie_list]
+        blocks_list = [wall_list, warp_list]
+        for wall in wall_list:
+            wall.draw(canvas)
+            dire = dir_collision(wall.pos, wall.size[1]/2, wall.size[1]/2, wall.size[0]/2, wall.size[0]/2,
+                      player.pos, player.vel, player.state, PLAYER_UP, PLAYER_DOWN, PLAYER_LEFT, PLAYER_RIGHT,
+                      UP_VELOCITY, DOWN_VELOCITY)
+            #if theres a collision and a direction, the player is pushed back in the opposite
+            #direction and that velocity is set to 0
+            if dire == "south":
+                player.pos[1] = wall.pos[1] + wall.size[1]/2 + PLAYER_UP
+                player.vel[1] = 0
+            elif dire == "north":
+                player.pos[1] = wall.pos[1] - wall.size[1]/2 - PLAYER_DOWN
+                player.vel[1] = 0
+            elif dire == "east":
+                player.pos[0] = wall.pos[0] + wall.size[0]/2 + PLAYER_RIGHT
+                player.vel[0] = 0
+            elif dire == "west":
+                player.pos[0] = wall.pos[0] - wall.size[0]/2 -PLAYER_LEFT
+                player.vel[0] = 0
+                
+        for fake_wall in fake_wall_list:
+            fake_wall.draw(canvas)
+        for warp in warp_list:
+            warp.draw(canvas)
+            col_check = obj_collision(warp.pos, BLOCK_SIZE[0]/2, BLOCK_SIZE[0]/2, BLOCK_SIZE[1]/2,
+                      BLOCK_SIZE[1]/2, player.pos, player.vel,player.state,
+                      PLAYER_LEFT, PLAYER_RIGHT, PLAYER_UP, PLAYER_DOWN)
+            #if player collides with a warp in the current stage
+            if col_check:
+                no_enemies = True
+                for enemies in enemies_list:
+                    if enemies != []:
+                        no_enemies = False
+                if no_enemies:
+                    #erases all entities
+                    wall_list = []
+                    fake_wall_list = []
+                    zombie_list = []
+                    super_zombie_list = []
+                    thrower_list = []
+                    flask_list = []
+                    boss_list = []
+                    warp_list = []
+                    health_list = []
+                    item_list = []
+                    #sets the current stage
+                    current_stage = warp.stage
+                    #warps player to new location
+                    player.pos = warp.warp_loci
+                    #makes the new stage
+                    Stage(current_stage)
+                    Warp_stage(current_stage)
+                else:
+                    dire = dir_collision(warp.pos, BLOCK_SIZE[1]/2, BLOCK_SIZE[1]/2, BLOCK_SIZE[0]/2, BLOCK_SIZE[0]/2,
+                      player.pos, player.vel, player.state, PLAYER_UP, PLAYER_DOWN, PLAYER_LEFT, PLAYER_RIGHT,
+                      UP_VELOCITY, DOWN_VELOCITY)
+                    #codes for collisions based on player face and velocity
+                    #pushes player back like a wall when objective is not complete yet
+                    if dire == "south":
+                        player.pos[1] = warp.pos[1] + BLOCK_SIZE[1]/2 + PLAYER_UP
+                        player.vel[1] = 0
+                    elif dire == "north":
+                        player.pos[1] = warp.pos[1] - BLOCK_SIZE[1]/2 - PLAYER_DOWN
+                        player.vel[1] = 0
+                    elif dire == "east":
+                        player.pos[0] = warp.pos[0] + BLOCK_SIZE[0]/2+ PLAYER_RIGHT
+                        player.vel[0] = 0
+                    elif dire == "west":
+                        player.pos[0] = warp.pos[0] - BLOCK_SIZE[0]/2 -PLAYER_LEFT
+                        player.vel[0] = 0
+        player.update()
+        player.draw(canvas)
+        if player.physics:
+            physics.update()
+            physics.draw(canvas)
+            #checks for collisions with all enemies
+            for enemies in enemies_list:
+                for enemy in enemies:
+                    if cir_collision(physics.pos,physics.radius,
+                                    enemy.pos, enemy.up, enemy.down, enemy.left, enemy.right):
+                        #if there's a collision with an enemy, makes the enemy stunned
+                        #and damages it
+                        if not enemy.invincible:
+                            enemy.health -= physics.dmg
+                            enemy.stunned = True
+                            enemy.animated = False
+                            enemy.invincible = True
+                            enemy.realtime_initialized = True
+                        #allows wrecking ball to bounce back when hit something
+                        physics.spin -= 2*physics.spin_dir
+                        physics.spin_dir = -physics.spin_dir
+                        if player.physics_level > 4:
+                            player.force_field = True
+                            player.force_counter = 0
+                        physics.update()
+            for wall in wall_list:
+                #bounces the wrecking ball if it hits a wall
+                if cir_collision(physics.pos, physics.radius,
+                                 wall.pos, BLOCK_SIZE[1]/2,BLOCK_SIZE[1]/2,BLOCK_SIZE[0]/2,BLOCK_SIZE[0]/2):
+                    #wrecking ball bounces when hit something
+                    physics.spin -= 2*physics.spin_dir
+                    physics.spin_dir = -physics.spin_dir
+                    physics.update()
+        if player.biology:
+            biology.update()
+            biology.draw(canvas)
+            #if the scalpel collides with an enemy, it damages them and heals the player
+            for enemies in enemies_list:
+                for enemy in enemies:
+                    if obj_collision(biology.pos, biology.SCALPEL_COL_X/2, biology.SCALPEL_COL_X/2,
+                                    biology.SCALPEL_COL_Y/2,biology.SCALPEL_COL_Y/2,
+                                    enemy.pos, enemy.vel, enemy.state,
+                                    enemy.left, enemy.right, enemy.up, enemy.down):
+                        if not enemy.invincible:
+                            if player.biology_level > 4:
+                                player.aura_counter = 0
+                                player.aura = True
+                            enemy.health -= biology.dmg
+                            enemy.invincible = True
+                            if player.health < player.max_health:
+                                player.health += biology.healing
+                            if enemy.health <= 0:
+                                position = enemy.pos
+                                enemies.remove(enemy)
+                                player.exp += enemy.exp_drop
+                                chance_drop = random.randint(1,100)
+                                if enemy.enemy_type == "zombie":
+                                    if player.biology_level < 5:
+                                #drop chances for scalpel when level under 5
+                                        if chance_drop >= (90 - 4*player.biology_level):
+                                            health_list.append(Healthpack(SHEALTH_RECOVER,
+                                                                      SHEALTH_SIZE,
+                                                                      SHEALTH_IMG, position,
+                                                                      [SHEALTH_IMG_WIDTH, SHEALTH_IMG_HEIGHT]))
+                                    elif chance_drop >= (90 - 4*player.biology_level):
+                                                health_list.append(Healthpack(LHEALTH_RECOVER,
+                                                                          LHEALTH_SIZE,
+                                                                          LHEALTH_IMG, position,
+                                                                          [LHEALTH_IMG_WIDTH, LHEALTH_IMG_HEIGHT]))
+                                    elif chance_drop <= (30 + 2*player.biology_level):
+                                        health_list.append(Healthpack(MHEALTH_RECOVER,
+                                                                      MHEALTH_SIZE,
+                                                                      MHEALTH_IMG, position,
+                                                                      [MHEALTH_IMG_WIDTH, MHEALTH_IMG_HEIGHT]))
+                                elif enemy.enemy_type == "super zombie":
+                                    if player.biology_level < 5:
+                                        if chance_drop >= (90 - 4*player.biology_level):
+                                            health_list.append(Healthpack(MHEALTH_RECOVER,
+                                                                      MHEALTH_SIZE,
+                                                                      MHEALTH_IMG, position,
+                                                                      [MHEALTH_IMG_WIDTH, MHEALTH_IMG_HEIGHT]))
+                                        elif chance_drop == 11:
+                                            health_list.append(Healthpack(LHEALTH_RECOVER,
+                                                                      LHEALTH_SIZE,
+                                                                      LHEALTH_IMG, position,
+                                                                      [LHEALTH_IMG_WIDTH, LHEALTH_IMG_HEIGHT]))
+                                    elif chance_drop >= (90 - 4*player.biology_level):
+                                            health_list.append(Healthpack(LHEALTH_RECOVER,
+                                                                      LHEALTH_SIZE,
+                                                                      LHEALTH_IMG, position,
+                                                                      [LHEALTH_IMG_WIDTH, LHEALTH_IMG_HEIGHT]))
+                                    elif chance_drop >= (70 - 4*player.biology_level):
+                                        health_list.append(Healthpack(MHEALTH_RECOVER,
+                                                                      MHEALTH_SIZE,
+                                                                      MHEALTH_IMG, position,
+                                                                      [MHEALTH_IMG_WIDTH, MHEALTH_IMG_HEIGHT]))
+                                elif enemy.enemy_type == "thrower":
+                                    if chance_drop >= (90 - 2*player.biology_level):
+                                        health_list.append(Healthpack(MHEALTH_RECOVER,
+                                                                  MHEALTH_SIZE,
+                                                                  MHEALTH_IMG, position,
+                                                                  [MHEALTH_IMG_WIDTH, MHEALTH_IMG_HEIGHT]))
+                                    if player.biology_level>4:
+                                        if chance_drop <= (40 + 2*player.biology_level):
+                                            item_list.append(Item('burn', BURN_HEAL_SIZE,
+                                                                          BURN_HEAL_IMG, position, 
+                                                                          [BURN_HEAL_IMG_WIDTH, BURN_HEAL_IMG_HEIGHT]))
+                                elif enemy.enemy_type == "tony":
+                                    item_list.append(Item('agar', AGAR_SIZE,
+                                                                      AGAR_IMG, position, 
+                                                                      [AGAR_IMG_WIDTH, AGAR_IMG_HEIGHT]))
+        #codes for all  flasks
+        for flask in chemistry_list:
+            flask.dmg = FLASK_DAMAGE + 2*player.chemistry_level
+            flask.burn_damage = BURN_DAMAGE + 2*player.chemistry_level
+            flask.draw(canvas)
+            flask.update()
+            #if flask collides with enemy, damages enemy and explodes
+            if flask.source == 'player':
+                for enemies in enemies_list:
+                    for enemy in enemies:
+                        if obj_collision(flask.pos, flask.size[0]/2,flask.size[0]/2,
+                                            flask.size[1]/2,flask.size[1]/2,
+                                            enemy.pos, enemy.vel, enemy.state,
+                                            enemy.left, enemy.right, enemy.up, enemy.down):
+                            position = flask.pos
+                            damage = flask.dmg
+                            flask.initialized = False
+                            if flask in chemistry_list:
+                                chemistry_list.remove(flask)
+                            chemistry.pos = [player.pos[0],player.pos[1]]
+                            if not enemy.invincible:
+                                enemy.health -= damage
+                                enemy.invincible = True
+                                enemy.burn = True
+                            #draws the fire emoji when burning
+                            canvas.draw_image(BURN_IMG, [BURN_IMG_WIDTH/2, BURN_IMG_HEIGHT/2],
+                              [BURN_IMG_WIDTH, BURN_IMG_HEIGHT],
+                              position,
+                              [2*FLASK_EXPLOSION_SIZE, 2*FLASK_EXPLOSION_SIZE])
+                            if hitbox_display:
+                                canvas.draw_circle(position, FLASK_EXPLOSION_SIZE,
+                                                      3, 'Red')
+                            #makes sure all enemies in the hit radius are burned as well
+                            for enemies in burnable_enemies_list:
+                                for enemy in enemies:
+                                    if not enemy.invincible:
+                                        if cir_collision(position,FLASK_EXPLOSION_SIZE,
+                                                            enemy.pos,
+                                                            enemy.up, enemy.down, enemy.left, enemy.right):
+                                            enemy.burn = True
+                            if not player.invincible:
+                                if player.state == "solid":
+                                    if cir_collision(position,FLASK_EXPLOSION_SIZE,
+                                                        player.pos,
+                                                        PLAYER_UP, PLAYER_DOWN, PLAYER_LEFT, PLAYER_RIGHT):
+                                        player.burn = True
+                for blocks in blocks_list:
+                    for block in blocks:
+                        if obj_collision(block.pos, block.size[0]/2, block.size[0]/2, block.size[1]/2, block.size[1]/2,
+                                        flask.pos, flask.vel, "solid",
+                                        FLASK_SIZE[0]/2, FLASK_SIZE[0]/2, FLASK_SIZE[1]/2, FLASK_SIZE[1]/2):
+                            flask.initialized = False
+                            position = flask.pos
+                            damage = flask.dmg
+                            canvas.draw_image(BURN_IMG, [BURN_IMG_WIDTH/2, BURN_IMG_HEIGHT/2],
+                              [BURN_IMG_WIDTH, BURN_IMG_HEIGHT],
+                              position,
+                              [2*FLASK_EXPLOSION_SIZE, 2*FLASK_EXPLOSION_SIZE])
+                            if hitbox_display:
+                                canvas.draw_circle(position, FLASK_EXPLOSION_SIZE,
+                                                      3, 'Red')
+                            chemistry.pos = [player.pos[0],player.pos[1]]
+                            if len(chemistry_list) >= 1:
+                                if flask in chemistry_list:
+                                    chemistry_list.remove(flask)
+                            for enemies in burnable_enemies_list:
+                                for enemy in enemies:
+                                     if not enemy.invincible:
+                                        if cir_collision(position,FLASK_EXPLOSION_SIZE,
+                                                        enemy.pos,
+                                                        enemy.up, enemy.down, enemy.left, enemy.right):
+                                            enemy.burn = True   
+                            if not player.invincible:
+                                if player.state == "solid":
+                                    if cir_collision(position,FLASK_EXPLOSION_SIZE,
+                                                        player.pos,
+                                                        PLAYER_UP, PLAYER_DOWN, PLAYER_LEFT, PLAYER_RIGHT):
+                                        player.burn = True
+            #allows for flask collisions with the wall
+            if flask.source == 'enemy':
+                if obj_collision(flask.pos, flask.size[0]/2,flask.size[0]/2,
+                                        flask.size[1]/2,flask.size[1]/2,
+                                        player.pos, player.vel, player.state,
+                                        PLAYER_LEFT, PLAYER_RIGHT, PLAYER_UP, PLAYER_DOWN):
+                        position = flask.pos
+                        damage = flask.dmg
+                        flask.initialized = False
+                        if flask in chemistry_list:
+                            chemistry_list.remove(flask)
+                        if not player.invincible:
+                            player.health -= THROWER_DAMAGE*player.shielding
+                            player.invincible = True
+                            player.burn = True
+                        canvas.draw_image(BURN_IMG, [BURN_IMG_WIDTH/2, BURN_IMG_HEIGHT/2],
+                          [BURN_IMG_WIDTH, BURN_IMG_HEIGHT],
+                          position,
+                          [2*FLASK_EXPLOSION_SIZE, 2*FLASK_EXPLOSION_SIZE])
+                        if hitbox_display:
+                            canvas.draw_circle(position, FLASK_EXPLOSION_SIZE,
+                                                  3, 'Red')
+                for blocks in blocks_list:
+                    for block in blocks:
+                        if obj_collision(block.pos, block.size[0]/2, block.size[0]/2, block.size[1]/2, block.size[1]/2,
+                                        flask.pos, flask.vel, "solid",
+                                        FLASK_SIZE[0]/2, FLASK_SIZE[0]/2, FLASK_SIZE[1]/2, FLASK_SIZE[1]/2):
+                            flask.initialized = False
+                            position = flask.pos
+                            damage = flask.dmg
+                            canvas.draw_image(BURN_IMG, [BURN_IMG_WIDTH/2, BURN_IMG_HEIGHT/2],
+                              [BURN_IMG_WIDTH, BURN_IMG_HEIGHT],
+                              position,
+                              [2*FLASK_EXPLOSION_SIZE, 2*FLASK_EXPLOSION_SIZE])
+                            if hitbox_display:
+                                canvas.draw_circle(position, FLASK_EXPLOSION_SIZE,
+                                                      3, 'Red')
+                            chemistry.pos = [player.pos[0],player.pos[1]]
+                            if len(chemistry_list) >= 1:
+                                if flask in chemistry_list:
+                                    chemistry_list.remove(flask)
+                            if not player.invincible:
+                                if player.state == "solid":
+                                    if cir_collision(position,FLASK_EXPLOSION_SIZE,
+                                                        player.pos,
+                                                        PLAYER_UP, PLAYER_DOWN, PLAYER_LEFT, PLAYER_RIGHT):
+                                        player.burn = True
+        for enemies in enemies_list:
+            for enemy in enemies:
+                enemy.update()
+                col_check = obj_collision(player.pos, PLAYER_LEFT, PLAYER_RIGHT, PLAYER_UP, PLAYER_DOWN,
+                enemy.pos, enemy.vel, enemy.state,
+                          enemy.left, enemy.right, enemy.up, enemy.down)
+                #if there's a general collision with a enemy, player takes damage
+                #and becomes invincible, if they were not invincible to begin with
+                if col_check:
+                    if not player.invincible:
+                        if player.state == "solid":
+                            player.health = player.health - enemy.damage*player.shielding
+                            player.invincible = True
+                            enemy.invincible = True
+                #enemy collisions with walls
+                for blocks in blocks_list:
+                    for block in blocks:
+                        dire = dir_collision(block.pos, block.size[1]/2, block.size[1]/2, block.size[0]/2, block.size[0]/2,
+                              enemy.pos, enemy.vel, enemy.state, enemy.up, enemy.down, enemy.left, enemy.right,
+                              enemy.vel_list[0][1], enemy.vel_list[1][1])
+                              #allows for zombie collisions with walls
+                              #makes zombies bounce when hitting a wall
+                        if dire == "south":
+                            enemy.pos[1] = block.pos[1] + block.size[1]/2 + enemy.up
+                            enemy.vel = enemy.vel_list[1]
+                        elif dire == "north":
+                            enemy.pos[1] = block.pos[1] - block.size[1]/2 - enemy.down
+                            enemy.vel = enemy.vel_list[0]
+                        elif dire == "east":
+                            enemy.pos[0] = block.pos[0] + block.size[0]/2 + enemy.left + 1
+                            enemy.vel = enemy.vel_list[2]
+                        elif dire == "west":
+                            enemy.pos[0] = block.pos[0] - block.size[0]/2 -enemy.right - 1
+                            enemy.vel = enemy.vel_list[3]
+                        if enemy.vel[1] < 0:
+                            enemy.face = "up"
+                        if enemy.vel[1] > 0:
+                            enemy.face = "down"
+                        if enemy.vel[0] < 0:
+                            enemy.face = "left"
+                        if enemy.vel[0] > 0:
+                            enemy.face = "right"
+                        #if the enemy dies, the enemy gives exp, is removed from the draw list
+                        #and has a chance to drop
+                    if enemy.health <= 0:
+                        if enemy in enemies:
+                            position = enemy.pos
+                            enemies.remove(enemy)
+                            player.exp += enemy.exp_drop
+                            #random chance drops
+                            chance_drop = random.randint(1,100)
+                            if enemy.enemy_type == "zombie":
+                                if chance_drop <= 10:
+                                    health_list.append(Healthpack(SHEALTH_RECOVER,
+                                                                  SHEALTH_SIZE,
+                                                                  SHEALTH_IMG, position,
+                                                                  [SHEALTH_IMG_WIDTH, SHEALTH_IMG_HEIGHT]))
+                                elif chance_drop >= 96:
+                                    health_list.append(Healthpack(MHEALTH_RECOVER,
+                                                                  MHEALTH_SIZE,
+                                                                  MHEALTH_IMG, position,
+                                                                  [MHEALTH_IMG_WIDTH, MHEALTH_IMG_HEIGHT]))
+                                elif chance_drop == 11:
+                                    health_list.append(Healthpack(LHEALTH_RECOVER,
+                                                                  LHEALTH_SIZE,
+                                                                  LHEALTH_IMG, position,
+                                                                  [LHEALTH_IMG_WIDTH, LHEALTH_IMG_HEIGHT]))
+                            if enemy.enemy_type == "super zombie":
+                                if chance_drop <= 10:
+                                    health_list.append(Healthpack(SHEALTH_RECOVER,
+                                                                  SHEALTH_SIZE,
+                                                                  SHEALTH_IMG, position,
+                                                                  [SHEALTH_IMG_WIDTH, SHEALTH_IMG_HEIGHT]))
+                                elif chance_drop >= 96:
+                                    health_list.append(Healthpack(MHEALTH_RECOVER,
+                                                                  MHEALTH_SIZE,
+                                                                  MHEALTH_IMG, position,
+                                                                  [MHEALTH_IMG_WIDTH, MHEALTH_IMG_HEIGHT]))
+                                elif chance_drop == 11:   
+                                    health_list.append(Healthpack(LHEALTH_RECOVER,
+                                                                  LHEALTH_SIZE,
+                                                                  LHEALTH_IMG, position,
+                                                                  [LHEALTH_IMG_WIDTH, LHEALTH_IMG_HEIGHT]))
+                                if random.randint(1,5) == 5:
+                                    item_list.append(Item('burn', BURN_HEAL_SIZE,
+                                                                      BURN_HEAL_IMG, position, 
+                                                                      [BURN_HEAL_IMG_WIDTH, BURN_HEAL_IMG_HEIGHT]))         
+                            if enemy.enemy_type == "thrower":
+                                if chance_drop <= 10:
+                                    health_list.append(Healthpack(SHEALTH_RECOVER,
+                                                                  SHEALTH_SIZE,
+                                                                  SHEALTH_IMG, position,
+                                                                  [SHEALTH_IMG_WIDTH, SHEALTH_IMG_HEIGHT]))
+                                elif chance_drop >= 96:
+                                    health_list.append(Healthpack(MHEALTH_RECOVER,
+                                                                  MHEALTH_SIZE,
+                                                                  MHEALTH_IMG, position,
+                                                                  [MHEALTH_IMG_WIDTH, MHEALTH_IMG_HEIGHT]))
+                                elif chance_drop == 11:
+                                    health_list.append(Healthpack(LHEALTH_RECOVER,
+                                                                  LHEALTH_SIZE,
+                                                                  LHEALTH_IMG, position,
+                                                                  [LHEALTH_IMG_WIDTH, LHEALTH_IMG_HEIGHT]))
+                                if random.randint(1,5) == 5:
+                                    item_list.append(Item('burn', BURN_HEAL_SIZE,
+                                                                      BURN_HEAL_IMG, position, 
+                                                                      [BURN_HEAL_IMG_WIDTH, BURN_HEAL_IMG_HEIGHT]))
+                            if enemy.enemy_type == "tony":
+                                item_list.append(Item('agar', AGAR_SIZE,
+                                                              AGAR_IMG, position, 
+                                                              [AGAR_IMG_WIDTH, AGAR_IMG_HEIGHT]))
+                enemy.draw(canvas)
+        for pack in health_list:
+            #draws health pack if not collided and if collided, heals player
+            col = obj_collision(pack.pos, pack.size[0]/2, pack.size[0]/2, pack.size[1]/2,
+                  pack.size[1]/2, player.pos, player.vel, player.state,
+                  PLAYER_LEFT, PLAYER_RIGHT, PLAYER_UP, PLAYER_DOWN)
+            if col:
+                player.health += pack.health
+                if player.health > player.max_health:
+                    player.health = player.max_health
+                health_list.remove(pack)
+            else:
+                pack.draw(canvas)
+        for item in item_list:
+            #draws burn heal if not collided and if collided, cures player
+            col = obj_collision(item.pos, item.size[0]/2, item.size[0]/2, item.size[1]/2,
+                  item.size[1]/2, player.pos, player.vel, player.state,
+                  PLAYER_LEFT, PLAYER_RIGHT, PLAYER_UP, PLAYER_DOWN)
+            if col:
+                if item.status == 'burn':
+                    player.burn = False
+                #ends game if agar is collected
+                elif item.status == 'agar':
+                    current_scene = 'win'
+                    wall_list = []
+                    fake_wall_list = []
+                    zombie_list = []
+                    super_zombie_list = []
+                    tony_list = []
+                    thrower_list = []
+                    flask_list = []
+                    boss_list = []
+                    warp_list = []
+                    health_list = []
+                    item_list = []
+                    checker = True
+                    game_start = False
+                if item in item_list:
+                    item_list.remove(item)
+            else:
+                item.draw(canvas)
+        h_bar.draw(canvas)
+        sta_bar.update()
+        sta_bar.draw(canvas)
+        exp_bar.update()
+        exp_bar.draw(canvas)
+        player_pos_display = player.pos
+        if coordinate_display:
+            label.set_text(str(player_pos_display))
+
+def key_down(key):
+    global pause, text_pause_title, scene_skills, current_scene
+    if game_start:
+        if simplegui.KEY_MAP['Q'] == key:
+            if pause:
+                current_scene = "start"
+                pause = False
+            elif not pause:
+                current_scene = 'skills'
+                pause = True
+        if simplegui.KEY_MAP['l'] == key:
+            if player.chemistry_level > 0:
+                if not chemistry.initialized:
+                    player.chemistry = True
+                    chemistry.initialized = True
+                    chemistry.face = player.face
+                    chemistry.pos = [player.pos[0],player.pos[1]]
+                    chemistry_list.append(chemistry)
+        if simplegui.KEY_MAP['k'] == key:
+            if player.biology_level > 0:
+                player.biology = True
+                player.physics = False
+        if simplegui.KEY_MAP['j'] == key:
+            if player.physics_level > 0:
+                player.physics = True
+                player.biology = False
+        if simplegui.KEY_MAP['space'] == key:
+            if player.stamina > 0:
+                player.sprint = True
+            else:
+                player.sprint = False
+        if simplegui.KEY_MAP['w'] == key:
+            player.face = "up"
+            player.animated = True
+            if not player.sprint:
+                player.vel[1] = UP_VELOCITY
+            elif player.sprint:
+                player.vel[1] = UP_SPRINT_VELOCITY
+        if simplegui.KEY_MAP['s'] == key:
+            player.animated = True
+            player.face = "down"
+            if not player.sprint:
+                player.vel[1] = DOWN_VELOCITY
+            elif player.sprint:
+                player.vel[1] = DOWN_SPRINT_VELOCITY
+        if simplegui.KEY_MAP['d'] == key:
+            player.animated = True
+            player.face = "right"
+            if not player.sprint:
+                player.vel[0] = RIGHT_VELOCITY
+            elif player.sprint:
+                player.vel[0] = RIGHT_SPRINT_VELOCITY
+        if simplegui.KEY_MAP['a'] == key:
+            player.animated = True
+            player.face = "left"
+            if not player.sprint:
+                player.vel[0] = LEFT_VELOCITY
+            elif player.sprint:
+                player.vel[0] = LEFT_SPRINT_VELOCITY
+        if simplegui.KEY_MAP['p'] == key:
+            player.state = "gas"
+            player.burn = False
+            player.health = player.max_health
+            player.stamina = player.total_stamina
+
+def key_up(key):
+    if game_start:
+        if simplegui.KEY_MAP['k'] == key:
+            if player.biology:
+                player.biology = False
+        if simplegui.KEY_MAP['j'] == key:
+            if player.physics:
+                player.physics = False
+        if simplegui.KEY_MAP['w'] == key:
+            if(player.vel[1] == UP_VELOCITY
+            or player.vel[1] == UP_SPRINT_VELOCITY):
+                player.vel[1] = 0
+                #double checks to see if player isn't moving
+                if player.vel[0] == 0:
+                    player.animated = False
+        if simplegui.KEY_MAP['space'] == key:
+                player.sprint = False
+        if simplegui.KEY_MAP['s'] == key:
+            if(player.vel[1] == DOWN_VELOCITY
+            or player.vel[1] == DOWN_SPRINT_VELOCITY):
+                player.vel[1] = 0
+                if player.vel[0] == 0:
+                    player.animated = False
+        if simplegui.KEY_MAP['d'] == key:
+            if(player.vel[0] == RIGHT_VELOCITY
+            or player.vel[0] == RIGHT_SPRINT_VELOCITY):
+                player.vel[0] = 0
+                if player.vel[1] == 0:
+                    player.animated = False
+        if simplegui.KEY_MAP['a'] == key:
+            if(player.vel[0] == LEFT_VELOCITY
+            or player.vel[0] == LEFT_SPRINT_VELOCITY):
+                player.vel[0] = 0
+                if player.vel[1] == 0:
+                    player.animated = False
+        if simplegui.KEY_MAP['p'] == key:
+            player.state = "solid"
+#menu variables
+#frame must be defined here so text_width function can be used
+frame = simplegui.create_frame("Button Demo", WIDTH, HEIGHT)
+def text_width(text, size):
+    return frame.get_canvas_textwidth(text, size)
+#text stuff
+text_title = Text(50, "Agar Quest", "Black", [(WIDTH-text_width("Agar Quest", 30))/2-50, HEIGHT/2 - 200], True)
+text_game_over = Text(50, "Game Over", "Red", [(WIDTH-text_width("Game Over", 30))/2-50, HEIGHT/2 - 200], True)
+text_win1 = Text(45, "You Win", "Black", [(WIDTH-text_width("You Win", 45))/2, HEIGHT/2 - 200], True)
+text_win2 = Text(25, "(But the agar was burned anyways)", "Black", [(WIDTH-text_width("(But the agar was burned anyways)", 25))/2, HEIGHT/2 - 150], True)
+text_help1 = Text(15, "Move around using WASD and sprint with the space bar", "Black", [20,60], True)
+text_help2 = Text(15, "J,K,L, are your Physics, Biology, and Chemistry moves respectively", "Black", [20,90], True)
+text_help3 = Text(15, "Physics deploys a wreckingball that stuns enemies", "Black", [20,120], True)
+text_help4 = Text(15, "Biology lets you stab with a life draining scalpel", "Black", [20,150], True)
+text_help5 = Text(15, "Chemistry lets you make an explosion to burn enemies and yourself", "Black", [20,180], True)
+text_help6 = Text(15, "Only when you've leveled up your skill once can you use it", "Black", [50,220], True)
+text_help7 = Text(15, "Q opens up your skill point menu where you can spend skill points", "Black", [20,250], True)
+text_help8 = Text(15, "Only when you clear all the enemies can you advance through portals", "Black", [20,280], True)
+#button stuff
+button_start_game = Button([150,50], "Start", "Blue", 'start', [WIDTH/2,HEIGHT/2+15], "White", True,
+                  [WIDTH/2-30,HEIGHT/2+20], 30, "Black")
+button_menu_over = Button([200,50], "Back to Menu", "Red", 'menu', [WIDTH/2,HEIGHT/2+15], "Black", True,
+                  [(WIDTH-text_width("Back to Menu", 30))/2,HEIGHT/2+20], 30, "Black")
+button_menu_win = Button([200,50], "Back to Menu", "Orange", 'menu', [WIDTH/2,HEIGHT/2+15], "White", True,
+                  [(WIDTH-text_width("Back to Menu", 30))/2,HEIGHT/2+20], 30, "Black")
+button_help = Button([150,100], "Controls", "Orange", 'help', [WIDTH/2, HEIGHT/2+100],
+                  "White", False, [(WIDTH-text_width("Controls", 30))/2, HEIGHT/2+100+15], 30, "Black")
+button_menu = Button([150,100], "Menu", "Red", 'menu', [150, HEIGHT-100],
+                  "White", False, [(150+text_width("Menu", 30))/2, HEIGHT-100+15], 30, "Black")
+button_list = [button_help, button_menu, button_start_game]
+#scene stuff
+scene_start_game = Scene('start', None, None)
+scene_menu = Scene('menu', [button_start_game, button_help], [text_title])
+scene_help = Scene('help', [button_menu],[text_help1, text_help2, text_help3, text_help4, text_help5, text_help6, text_help7, text_help8])
+scene_game_over = Scene('game over', [button_menu_over], [text_game_over])
+scene_win = Scene("win", [button_menu_win], [text_win1, text_win2])
+#defines first scene as menu
+current_scene = 'menu'
+draw_scene = scene_menu
+# Create a frame and assign callbacks to event handlers
+frame = simplegui.create_frame("Home", WIDTH, HEIGHT)
+frame.set_draw_handler(draw)
+frame.set_canvas_background("white")
+frame.set_keydown_handler(key_down)
+frame.set_keyup_handler(key_up)
+frame.set_mouseclick_handler(mouse_click)
+label = frame.add_label(player_pos_display)
+# Start the frame animation
+frame.start()
+
+
+
+
+  
